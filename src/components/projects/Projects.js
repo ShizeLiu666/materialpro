@@ -7,7 +7,7 @@ import default_image from "../../assets/images/projects/default_image.jpg";
 
 const API_development_environment = 'http://localhost:8000';
 
-const Cards = () => {
+const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [token, setToken] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -88,4 +88,4 @@ const Cards = () => {
   );
 };
 
-export default Cards;
+export default Projects;

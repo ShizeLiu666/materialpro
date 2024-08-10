@@ -4,14 +4,14 @@ import Feeds from "../components/dashboard/Feeds";
 import ProjectTables from "../components/dashboard/ProjectTable";
 
 import Blog from "../components/projects/Blog";
-import bg1 from "../assets/images/bg/bg1.jpg";
-import bg2 from "../assets/images/bg/bg2.jpg";
-import bg3 from "../assets/images/bg/bg3.jpg";
-import bg4 from "../assets/images/bg/bg4.jpg";
+// import bg1 from "../assets/images/bg/bg1.jpg";
+// import bg2 from "../assets/images/bg/bg2.jpg";
+// import bg3 from "../assets/images/bg/bg3.jpg";
+// import bg4 from "../assets/images/bg/bg4.jpg";
 
 const BlogData = [
   {
-    image: bg1,
+    // image: bg1,
     title: "This is simple blog",
     subtitle: "2 comments, 1 Like",
     description:
@@ -19,7 +19,7 @@ const BlogData = [
     btnbg: "primary",
   },
   {
-    image: bg2,
+    // image: bg2,
     title: "Lets be simple blog",
     subtitle: "2 comments, 1 Like",
     description:
@@ -27,7 +27,7 @@ const BlogData = [
     btnbg: "primary",
   },
   {
-    image: bg3,
+    // image: bg3,
     title: "Don't Lamp blog",
     subtitle: "2 comments, 1 Like",
     description:
@@ -35,7 +35,7 @@ const BlogData = [
     btnbg: "primary",
   },
   {
-    image: bg4,
+    // image: bg4,
     title: "Simple is beautiful",
     subtitle: "2 comments, 1 Like",
     description:

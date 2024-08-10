@@ -1,57 +1,57 @@
+import React from "react";
 import { Nav, NavItem } from "reactstrap";
 import { Link, useLocation } from "react-router-dom";
-// import user1 from "../assets/images/users/user4.jpg";
-// import probg from "../assets/images/bg/download.jpg";
+import '../assets/scss/loader/Sidebar.css'
 
 const navigation = [
   {
+    title: "Projects",
+    href: "/admin/projects",
+    icon: "bi bi-card-text",
+  },
+  {
     title: "Dashboard",
-    href: "/starter",
+    href: "/admin/starter",
     icon: "bi bi-speedometer2",
   },
   {
     title: "Alert",
-    href: "/alerts",
+    href: "/admin/alerts",
     icon: "bi bi-bell",
   },
   {
     title: "Badges",
-    href: "/badges",
+    href: "/admin/badges",
     icon: "bi bi-patch-check",
   },
   {
     title: "Buttons",
-    href: "/buttons",
+    href: "/admin/buttons",
     icon: "bi bi-hdd-stack",
   },
   {
-    title: "Projects",
-    href: "/cards",
-    icon: "bi bi-card-text",
-  },
-  {
     title: "Grid",
-    href: "/grid",
+    href: "/admin/grid",
     icon: "bi bi-columns",
   },
   {
     title: "Table",
-    href: "/table",
+    href: "/admin/table",
     icon: "bi bi-layout-split",
   },
   {
     title: "Forms",
-    href: "/forms",
+    href: "/admin/forms",
     icon: "bi bi-textarea-resize",
   },
   {
     title: "Breadcrumbs",
-    href: "/breadcrumbs",
+    href: "/admin/breadcrumbs",
     icon: "bi bi-link",
   },
   {
     title: "About",
-    href: "/about",
+    href: "/admin/about",
     icon: "bi bi-people",
   },
 ];

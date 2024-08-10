@@ -1,0 +1,102 @@
+.gradient-custom-2 {
+  /* fallback for old browsers */
+  background: #1f2122;
+
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: -webkit-linear-gradient(
+    to right,
+    #7d7f7f,
+    #68696a,
+    #525455,
+    #3d3e3f,
+    #232526
+  );
+
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: linear-gradient(
+    to right,
+    #7d7f7f,
+    #68696a,
+    #525455,
+    #3d3e3f,
+    #232526
+  );
+}
+
+.gradient-form {
+    /* 确保背景图覆盖整个页面 */
+    background-image: url('../../assets/images/logos/background.png');
+    background-size: cover; /* 确保背景图覆盖整个容器 */
+    background-position: center; /* 居中显示背景图 */
+    background-repeat: no-repeat; /* 防止背景图重复 */
+    height: 100vh; /* 使背景图覆盖整个视口高度 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+.card {
+background-color: rgba(255, 255, 255, 0.9); /* 使卡片有点透明，背景图能隐约可见 */
+}
+  
+
+@media (min-width: 768px) {
+  .gradient-form {
+    height: 100vh !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .gradient-custom-2 {
+    border-top-right-radius: 0.3rem;
+    border-bottom-right-radius: 0.3rem;
+  }
+}
+
+.custom-title {
+  margin-top: 20px !important;
+}
+
+.form-outline {
+  position: relative;
+}
+
+.form-outline input:focus ~ label,
+.form-outline input:not(:placeholder-shown) ~ label {
+  transform: translateY(-20px); /* label的浮动位置 */
+  font-size: 12px; /* label的浮动大小 */
+  color: #000; /* label的浮动颜色 */
+}
+
+.form-outline input {
+  padding: 10px 15px; /* 调整内边距 */
+  font-size: 16px; /* 调整字体大小 */
+  width: 100%; /* 确保输入框占满可用空间 */
+  box-sizing: border-box; /* 确保内边距不会影响元素的宽度 */
+  border-radius: 5px; /* 适当调整圆角 */
+  border: 1px solid #ced4da; /* 调整边框颜色 */
+}
+
+.form-container {
+  margin-top: 30px;
+}
+
+.move-down {
+  margin-top: 30px; /* 调整这个值以控制元素的位置 */
+}
+
+.text-gradient {
+  color: #ffffff; /* 白色文本 */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* 添加文本阴影 */
+  padding: 20px;
+  border-radius: 10px; /* 可选：增加圆角 */
+}
+
+button {
+    padding: 10px 20px; /* 调整内边距 */
+    font-size: 16px; /* 调整字体大小 */
+    border-radius: 5px; /* 适当调整圆角 */
+    width: 100%; /* 确保按钮占满可用空间 */
+    box-sizing: border-box; /* 确保内边距不会影响元素的宽度 */
+  }
+

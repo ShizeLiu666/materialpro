@@ -14,7 +14,8 @@ import {
   Button,
 } from "reactstrap";
 import kasta_logo from "../assets/images/logos/kasta_logo.png";
-import user1 from "../assets/images/users/user4.jpg";
+import user1 from "../assets/images/users/normal_user.jpg";
+import '../assets/scss/loader/Header.css';
 
 const Header = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -29,7 +30,7 @@ const Header = () => {
   };
 
   return (
-    <Navbar dark expand="md" className="fix-header navbar-gradient">
+    <Navbar dark expand="md" className="fix-header header-background">
       <div className="d-flex align-items-center">
         <NavbarBrand href="/">
           <img src={kasta_logo} alt="logo" className="logo" />
@@ -82,7 +83,7 @@ const Header = () => {
         </Nav>
         <Dropdown isOpen={dropdownOpen} toggle={toggle}>
         <DropdownToggle color="transparent" className="d-flex align-items-center">
-        <span className="me-2" style={{ color: 'white', fontSize: '20px' }}>Hi, User !</span>
+        <span className="me-2" style={{ color: 'black', fontSize: '20px' }}>Hi, UserName!</span>
             <img
               src={user1}
               alt="profile"

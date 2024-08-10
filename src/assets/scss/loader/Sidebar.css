@@ -1,0 +1,15 @@
+.nav-link.active {
+  background-color: #fbcd0b !important; /* 设置激活状态下的背景色为 #fbcd0b */
+  color: white !important; /* 激活状态下的文本颜色 */
+  font-weight: bold; /* 激活状态下的文本加粗 */
+}
+
+.nav-link {
+  color: #6c757d; /* 非激活状态下的文本颜色 */
+  transition: background-color 0.3s ease; /* 添加背景颜色过渡效果 */
+}
+
+.sidenav-bg {
+  margin-bottom: 5px; /* 每个导航项之间增加一些间距 */
+  border-radius: 4px; /* 导航项的圆角 */
+}

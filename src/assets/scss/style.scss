@@ -10,11 +10,11 @@
     transition: transform 0.3s ease-in-out;
   }
   
-  .blog-card:hover {
-    transform: scale(1.05);
-  }
-  
-  .modal-backdrop.show {
-    opacity: 0.8 !important;
-    background-color: #000 !important;
-  }
+.blog-card:hover {
+  transform: scale(1.05);
+}
+
+.modal-backdrop.show {
+  opacity: 0.8 !important;
+  background-color: #000 !important;
+}
