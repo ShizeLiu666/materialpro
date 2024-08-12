@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import kastaLogo from '../../assets/images/logos/kasta_logo.png';
+import { API_development_environment } from '../../config';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -14,11 +16,22 @@ const LoginPage = () => {
     setPassword('');
   }, []);
 
-  const handleLogin = () => {
-    if (username === '' && password === '') {
-      navigate('/admin/projects');
-    } else {
-      alert('Invalid username or password');
+  const handleLogin = async () => {
+    try {
+      // send login request to the server
+      const response = await axios.post(`${API_development_environment}/api/auth/get_token`);
+      if (response.data.token) {
+        // store the token in local storage
+        localStorage.setItem('authToken', response.data.token);
+        alert(localStorage.getItem('authToken'));
+        // navigate to admin dashboard
+        navigate('/admin/projects');
+      } else {
+        alert('Failed to retrieve token');
+      }
+    } catch (error) {
+      console.error('Error fetching token:', error);
+      alert('There was an error logging in. Please try again.');
     }
   };
 

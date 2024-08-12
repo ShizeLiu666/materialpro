@@ -2,18 +2,26 @@ import React from "react";
 import { Nav, NavItem } from "reactstrap";
 import { Link, useLocation } from "react-router-dom";
 import '../assets/scss/loader/Sidebar.css'
+// 导入图标
+import projecttIcon from '../assets/icons/project.png';
+import convertIcon from '../assets/icons/convert_file.png';
 
 const navigation = [
   {
     title: "Projects",
     href: "/admin/projects",
-    icon: "bi bi-card-text",
+    img: projecttIcon,
   },
   {
-    title: "Dashboard",
-    href: "/admin/starter",
-    icon: "bi bi-speedometer2",
+    title: "Converter",
+    href: "/admin/excelconverter",
+    img: convertIcon,
   },
+  // {
+  //   title: "Dashboard",
+  //   href: "/admin/starter",
+  //   icon: "bi bi-speedometer2",
+  // },
   {
     title: "Alert",
     href: "/admin/alerts",
@@ -38,11 +46,6 @@ const navigation = [
     title: "Table",
     href: "/admin/table",
     icon: "bi bi-layout-split",
-  },
-  {
-    title: "Forms",
-    href: "/admin/forms",
-    icon: "bi bi-textarea-resize",
   },
   {
     title: "Breadcrumbs",
@@ -74,7 +77,19 @@ const Sidebar = () => {
                     : "nav-link text-secondary py-3"
                 }
               >
-                <i className={navi.icon}></i>
+                {navi.img ? (
+                  <img
+                    src={navi.img}
+                    alt={navi.title}
+                    style={{
+                      filter: location.pathname === navi.href ? 'brightness(0) invert(1)' : 'none',
+                      width: '20px',
+                      height: '20px'
+                    }}
+                  />
+                ) : (
+                  <i className={navi.icon}></i>
+                )}
                 <span className="ms-3 d-inline-block">{navi.title}</span>
               </Link>
             </NavItem>

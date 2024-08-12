@@ -1,34 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col } from "reactstrap";
 import axios from "axios";
-import Blog from "../../components/projects/Blog";
-import PasswordModal from "../../components/projects/PasswordModal";
+import ProjectCard from "./ProjectCard";
+import PasswordModal from "./PasswordModal";
 import default_image from "../../assets/images/projects/default_image.jpg";
-
-const API_development_environment = 'http://localhost:8000';
+import { API_development_environment } from '../../config';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
-  const [token, setToken] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const response = await axios.post(`${API_development_environment}/api/auth/get_token`);
-        setToken(response.data.token);
-      } catch (error) {
-        console.error("Error fetching token:", error);
-      }
-    };
-
-    fetchToken();
-  }, []);
-
-  useEffect(() => {
     const fetchProjects = async () => {
       try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+          console.error("No token found, please log in again.");
+          return;
+        }
+
         const response = await axios.get(`${API_development_environment}/api/projects`, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -40,10 +31,8 @@ const Projects = () => {
       }
     };
 
-    if (token) {
-      fetchProjects();
-    }
-  }, [token]);
+    fetchProjects();
+  }, []);
 
   const toggleModal = () => {
     setModalOpen(!modalOpen);
@@ -61,12 +50,12 @@ const Projects = () => {
 
   return (
     <div>
-      <h5 className="mb-3">Project List</h5>
+      <h5 className="mb-3" style={{fontWeight: "bold"}}>Project List</h5>
       <Row>
         {projects.map((project, index) => (
           <Col sm="6" lg="6" xl="4" key={index}>
             <div onClick={() => handleCardClick(project)}>
-              <Blog
+              <ProjectCard
                 image={default_image}
                 title={project.name}
                 subtitle={project.address}

@@ -1,0 +1,1 @@
+export const API_development_environment = 'http://localhost:8000';
