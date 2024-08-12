@@ -92,7 +92,7 @@ background-color: rgba(255, 255, 255, 0.9); /* 使卡片有点透明，背景图
   border-radius: 10px; /* 可选：增加圆角 */
 }
 
-button {
+.login-button {
     padding: 10px 20px; /* 调整内边距 */
     font-size: 16px; /* 调整字体大小 */
     border-radius: 5px; /* 适当调整圆角 */

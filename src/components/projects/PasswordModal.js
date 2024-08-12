@@ -36,7 +36,7 @@ const PasswordModal = ({ isOpen, toggle, projectName, onSubmit }) => {
               required
             />
           </FormGroup>
-          <Button color="primary" type="submit">
+          <Button color="primary" size="sm" type="submit" style={{ backgroundColor: "#fbcd0b", borderColor: "#fbcd0b", fontWeight: "bold" }}>
             Submit
           </Button>
         </Form>

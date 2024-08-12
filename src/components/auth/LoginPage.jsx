@@ -83,7 +83,7 @@ const LoginPage = () => {
 
                         <div className="text-center pt-1 mb-5 pb-1 move-down">
                           <button
-                            className="btn btn-block fa-lg mb-3"
+                            className="btn btn-block fa-lg mb-3 login-button"
                             style={{ backgroundColor: '#fbcd0b' }}
                             type="submit"
                             onClick={handleLogin}
