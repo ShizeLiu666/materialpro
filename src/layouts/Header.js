@@ -44,8 +44,10 @@ const Header = () => {
   // Handle the logout action and redirect to the login page
   const handleLogout = () => {
     console.log("Logout button clicked");
-    toggleModal(); // Close the modal
-    navigate("/login"); // Redirect to the login page
+    localStorage.clear(); // 清空 localStorage
+    sessionStorage.clear(); // 清空 sessionStorage
+    navigate("/login"); // 重定向到登录页面
+    // window.location.reload(); // 刷新页面，清空所有状态
   };
 
   return (
@@ -78,7 +80,7 @@ const Header = () => {
       </div>
       <Collapse navbar isOpen={isOpen}>
         <Nav className="me-auto" navbar>
-          {/* You can add more navigation items here */}
+          {/* 你可以在这里添加更多导航项目 */}
         </Nav>
         <Dropdown isOpen={dropdownOpen} toggle={toggle}>
           <DropdownToggle color="transparent" className="d-flex align-items-center">
