@@ -4,6 +4,7 @@ import axios from "axios";
 import ProjectCard from "./ProjectCard";
 import PasswordModal from "./PasswordModal";
 import RoomTypeList from "../RoomTypeList/RoomTypeList";
+import RoomConfigList from "../RoomConfigurations/RoomConfigList"; // 导入 RoomConfigList
 import default_image from "../../../assets/images/projects/default_image.jpg";
 import { API_development_environment } from "../../../config";
 import Alert from "@mui/material/Alert";
@@ -12,6 +13,7 @@ const ProjectList = () => {
   const [projects, setProjects] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedRoomType, setSelectedRoomType] = useState(null);
   const [alert, setAlert] = useState({
     severity: "",
     message: "",
@@ -76,7 +78,7 @@ const ProjectList = () => {
           toggleModal();
           setBreadcrumbPath(["Project List", "Room Types"]); // 更新Breadcrumbs路径
           setShowRoomTypes(true); // 展示Room Types界面
-        }, 500);
+        }, 1000);
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -100,7 +102,6 @@ const ProjectList = () => {
         console.error("Error verifying password:", error);
       }
 
-      // 3秒后隐藏 `Alert`，但不关闭 `PasswordModal`
       setTimeout(() => {
         setAlert({ open: false });
       }, 3000);
@@ -110,6 +111,12 @@ const ProjectList = () => {
   const handleBreadcrumbClick = () => {
     setBreadcrumbPath(["Project List"]);
     setShowRoomTypes(false); // 回到项目列表
+  };
+
+  const handleNavigate = (newPath, roomTypeId, roomTypeName) => {
+    setBreadcrumbPath(newPath);
+    setSelectedRoomType({ id: roomTypeId, name: roomTypeName });
+    // console.log("Breadcrumb Path Updated:", newPath);
   };
 
   return (
@@ -129,7 +136,6 @@ const ProjectList = () => {
         </Alert>
       )}
 
-      {/* Breadcrumbs */}
       <Row>
         <Col>
           <Breadcrumb>
@@ -153,38 +159,64 @@ const ProjectList = () => {
                 "Project List"
               )}
             </BreadcrumbItem>
-            {breadcrumbPath.length > 1 && (
-              <BreadcrumbItem active>Room Types</BreadcrumbItem>
+            {breadcrumbPath.length > 2 ? (
+              <BreadcrumbItem>
+                <button
+                  onClick={() =>
+                    handleNavigate(["Project List", "Room Types"], null, null)
+                  }
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "blue",
+                    textDecoration: "underline",
+                    cursor: "pointer",
+                    padding: 0,
+                    font: "inherit",
+                  }}
+                >
+                  {breadcrumbPath[1]}
+                </button>
+              </BreadcrumbItem>
+            ) : (
+              <BreadcrumbItem active>{breadcrumbPath[1]}</BreadcrumbItem>
+            )}
+            {breadcrumbPath.length > 2 && (
+              <BreadcrumbItem active>{breadcrumbPath[2]}</BreadcrumbItem>
             )}
           </Breadcrumb>
         </Col>
       </Row>
 
-      {/* 如果 showRoomTypes 为 false 显示项目列表 */}
       {!showRoomTypes && (
-        <>
-          <Row>
-            {projects.map((project, index) => (
-              <Col sm="6" lg="6" xl="4" key={index}>
-                <div onClick={() => handleCardClick(project)}>
-                  <ProjectCard
-                    image={default_image}
-                    title={project.name}
-                    subtitle={project.address}
-                    color="primary"
-                  />
-                </div>
-              </Col>
-            ))}
-          </Row>
-        </>
+        <Row>
+          {projects.map((project, index) => (
+            <Col sm="6" lg="6" xl="4" key={index}>
+              <div onClick={() => handleCardClick(project)}>
+                <ProjectCard
+                  image={default_image}
+                  title={project.name}
+                  subtitle={project.address}
+                  color="primary"
+                />
+              </div>
+            </Col>
+          ))}
+        </Row>
       )}
 
-      {/* 如果 showRoomTypes 为 true 显示 RoomTypeList 组件 */}
-      {showRoomTypes && selectedProject && (
+      {showRoomTypes && selectedProject && breadcrumbPath.length === 2 && (
         <RoomTypeList
           projectId={selectedProject._id}
-          projectName={selectedProject.name} // 传递 projectName
+          projectName={selectedProject.name}
+          onNavigate={handleNavigate}
+        />
+      )}
+
+      {breadcrumbPath.length === 3 && selectedRoomType && (
+        <RoomConfigList
+          roomTypeId={selectedRoomType.id}
+          roomTypeName={selectedRoomType.name}
         />
       )}
 
