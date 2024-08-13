@@ -18,36 +18,25 @@ import {
 import kasta_logo from "../assets/images/logos/kasta_logo.png";
 import user1 from "../assets/images/users/normal_user.jpg";
 import '../assets/scss/loader/Header.css';
+import { useExcelConverter } from '../components/fileConverter/ExcelConverterContext'; // 正确导入 useExcelConverter
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { resetState } = useExcelConverter(); // 从 useExcelConverter 解构 resetState
 
-  // Toggle the dropdown menu in the header
   const toggle = () => setDropdownOpen((prevState) => !prevState);
-
-  // Toggle the collapse menu for mobile view
-  const Handletoggle = () => {
-    setIsOpen(!isOpen);
-  };
-
-  // Show or hide the mobile sidebar menu
-  const showMobilemenu = () => {
-    document.getElementById("sidebarArea").classList.toggle("showSidebar");
-  };
-
-  // Toggle the modal visibility
+  const Handletoggle = () => setIsOpen(!isOpen);
+  const showMobilemenu = () => document.getElementById("sidebarArea").classList.toggle("showSidebar");
   const toggleModal = () => setModalOpen(!modalOpen);
 
-  // Handle the logout action and redirect to the login page
   const handleLogout = () => {
     console.log("Logout button clicked");
     localStorage.clear(); // 清空 localStorage
-    sessionStorage.clear(); // 清空 sessionStorage
+    resetState(); // 调用 resetState 重置状态
     navigate("/login"); // 重定向到登录页面
-    // window.location.reload(); // 刷新页面，清空所有状态
   };
 
   return (

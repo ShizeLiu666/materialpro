@@ -110,7 +110,7 @@ const ExcelConverter = () => {
     <Row>
       <Col>
         <Card>
-          <CardTitle tag="h6" className="border-bottom p-3 mb-0" style={{fontWeight: "bold"}}>
+          <CardTitle tag="h6" className="border-bottom p-3 mb-0">
             Convert Excel file to JSON Format
           </CardTitle>
           {errorMessage && (

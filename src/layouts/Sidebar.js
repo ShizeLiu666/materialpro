@@ -57,6 +57,11 @@ const navigation = [
     href: "/admin/about",
     icon: "bi bi-people",
   },
+  {
+    title: "Form",
+    href: "/admin/forms",
+    icon: "bi bi-people",
+  },
 ];
 
 const Sidebar = () => {
