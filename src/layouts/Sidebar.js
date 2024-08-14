@@ -2,9 +2,9 @@ import React from "react";
 import { Nav, NavItem } from "reactstrap";
 import { Link, useLocation } from "react-router-dom";
 import '../assets/scss/loader/Sidebar.css'
-// 导入图标
 import projecttIcon from '../assets/icons/project.png';
 import convertIcon from '../assets/icons/convert_file.png';
+import aboutIcon from '../assets/icons/about.png';
 
 const navigation = [
   {
@@ -17,51 +17,51 @@ const navigation = [
     href: "/admin/excelconverter",
     img: convertIcon,
   },
+  {
+    title: "About",
+    href: "/admin/about",
+    icon: aboutIcon,
+  },
   // {
   //   title: "Dashboard",
   //   href: "/admin/starter",
   //   icon: "bi bi-speedometer2",
   // },
-  {
-    title: "Alert",
-    href: "/admin/alerts",
-    icon: "bi bi-bell",
-  },
-  {
-    title: "Badges",
-    href: "/admin/badges",
-    icon: "bi bi-patch-check",
-  },
-  {
-    title: "Buttons",
-    href: "/admin/buttons",
-    icon: "bi bi-hdd-stack",
-  },
-  {
-    title: "Grid",
-    href: "/admin/grid",
-    icon: "bi bi-columns",
-  },
-  {
-    title: "Table",
-    href: "/admin/table",
-    icon: "bi bi-layout-split",
-  },
-  {
-    title: "Breadcrumbs",
-    href: "/admin/breadcrumbs",
-    icon: "bi bi-link",
-  },
-  {
-    title: "About",
-    href: "/admin/about",
-    icon: "bi bi-people",
-  },
-  {
-    title: "Form",
-    href: "/admin/forms",
-    icon: "bi bi-people",
-  },
+  // {
+  //   title: "Alert",
+  //   href: "/admin/alerts",
+  //   icon: "bi bi-bell",
+  // },
+  // {
+  //   title: "Badges",
+  //   href: "/admin/badges",
+  //   icon: "bi bi-patch-check",
+  // },
+  // {
+  //   title: "Buttons",
+  //   href: "/admin/buttons",
+  //   icon: "bi bi-hdd-stack",
+  // },
+  // {
+  //   title: "Grid",
+  //   href: "/admin/grid",
+  //   icon: "bi bi-columns",
+  // },
+  // {
+  //   title: "Table",
+  //   href: "/admin/table",
+  //   icon: "bi bi-layout-split",
+  // },
+  // {
+  //   title: "Breadcrumbs",
+  //   href: "/admin/breadcrumbs",
+  //   icon: "bi bi-link",
+  // },
+  // {
+  //   title: "Form",
+  //   href: "/admin/forms",
+  //   icon: "bi bi-people",
+  // },
 ];
 
 const Sidebar = () => {

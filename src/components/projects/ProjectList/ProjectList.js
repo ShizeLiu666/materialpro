@@ -215,7 +215,8 @@ const ProjectList = () => {
 
       {breadcrumbPath.length === 3 && selectedRoomType && (
         <RoomConfigList
-          roomTypeId={selectedRoomType.id}
+          projectId={selectedProject._id} // 传递 projectId
+          roomTypeId={selectedRoomType.id} // 传递 roomTypeId
           roomTypeName={selectedRoomType.name}
         />
       )}
