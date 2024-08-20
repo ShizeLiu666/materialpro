@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Box, IconButton, CircularProgress } from "@mui/material";
+import {
+  Typography,
+  Box,
+  IconButton,
+  CircularProgress,
+  Button,
+} from "@mui/material";
 import RoomConfigElement from "./RoomConfigElement";
+import UploadRoomConfigModal from "./UploadRoomConfigModal"; // Import the new component
 import axios from "axios";
 import { API_development_environment } from "../../../config";
-import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
-import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
+import UnfoldLessIcon from "@mui/icons-material/UnfoldLess";
+import UnfoldMoreIcon from "@mui/icons-material/UnfoldMore";
 
 const RoomConfigList = ({ projectId, roomTypeId, roomTypeName }) => {
   const [expanded, setExpanded] = useState(true);
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false); // State to control modal visibility
 
   useEffect(() => {
     const fetchConfig = async () => {
@@ -48,24 +56,52 @@ const RoomConfigList = ({ projectId, roomTypeId, roomTypeName }) => {
     setExpanded((prevExpanded) => !prevExpanded);
   };
 
+  const toggleUploadModal = () => {
+    setUploadModalOpen(!uploadModalOpen);
+  };
+
   return (
     <Box>
       <Box
         sx={{
           display: "flex",
-          justifyContent: "flex-start",
+          justifyContent: "space-between",
           alignItems: "center",
           mb: 2, // Add some margin to the bottom for better spacing
         }}
       >
-        <Typography variant="h5" gutterBottom sx={{ marginRight: "5px", marginBottom: "3px"}}>
-          {roomTypeName}
-        </Typography>
-        <IconButton onClick={toggleExpandAll}>
-          {expanded ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
-        </IconButton>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Typography
+            variant="h5"
+            gutterBottom
+            sx={{ marginRight: "5px", marginBottom: "3px" }}
+          >
+            {roomTypeName}
+          </Typography>
+          <IconButton onClick={toggleExpandAll}>
+            {expanded ? <UnfoldLessIcon /> : <UnfoldMoreIcon />}
+          </IconButton>
+        </Box>
+        <Button
+          onClick={toggleUploadModal}
+          style={{
+            backgroundColor: "#fbcd0b",
+            color: "#fff",
+            fontWeight: "bold",
+            marginBottom: "5px", // 确保和 Create Room Type 按钮一致
+          }}
+          size="small"
+        >
+          UPLOAD CONFIG
+        </Button>
       </Box>
       <RoomConfigElement config={config} expandAll={expanded} />
+      <UploadRoomConfigModal
+        isOpen={uploadModalOpen}
+        toggle={toggleUploadModal}
+        projectId={projectId}
+        roomTypeId={roomTypeId}
+      />
     </Box>
   );
 };

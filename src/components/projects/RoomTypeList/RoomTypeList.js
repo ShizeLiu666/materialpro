@@ -44,8 +44,8 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
   }, [projectId]);
 
   const handleCreateRoomType = async (name) => {
+    const token = localStorage.getItem("authToken");
     try {
-      const token = localStorage.getItem("authToken");
       const response = await axios.post(
         `${API_development_environment}/api/projects/${projectId}/roomTypes`,
         { name },
@@ -57,7 +57,7 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
       );
       setRoomTypes([...roomTypes, response.data]);
     } catch (error) {
-      console.error("Error creating room type:", error);
+      throw error; // 将错误抛出给调用函数
     }
   };
 
@@ -123,7 +123,7 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
       roomType._id,
       roomType.name
     );
-};
+  };
   if (loading) {
     return <CircularProgress />;
   }
@@ -146,7 +146,7 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
             backgroundColor: "#fbcd0b",
             color: "#fff",
             fontWeight: "bold",
-            marginBottom: '5px'
+            marginBottom: "5px",
           }}
           size="small"
         >
