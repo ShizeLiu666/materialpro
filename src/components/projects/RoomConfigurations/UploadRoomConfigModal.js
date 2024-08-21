@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, Button, Alert, Spinner } from 'reactstrap';
-import axios from "axios";
-import { API_development_environment } from "../../../config";
+// import axios from "axios";
+import axiosInstance, { API_development_environment } from "../../../config";
 
 const UploadRoomConfigModal = ({ isOpen, toggle, projectId, roomTypeId }) => {
   const [file, setFile] = useState(null);
@@ -39,7 +39,7 @@ const UploadRoomConfigModal = ({ isOpen, toggle, projectId, roomTypeId }) => {
 
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_development_environment}/api/projects/${projectId}/${roomTypeId}/uploadConfig`,
         formData,
         {

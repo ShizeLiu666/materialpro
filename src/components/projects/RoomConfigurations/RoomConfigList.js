@@ -3,8 +3,8 @@ import { Typography, Box, IconButton, CircularProgress, Button } from "@mui/mate
 import RoomConfigElement from "./RoomConfigElement";
 import UploadRoomConfigModal from "./UploadRoomConfigModal";
 import DeleteRoomConfigModal from "./DeleteRoomConfigModal"; // 导入删除模态框组件
-import axios from "axios";
-import { API_development_environment } from "../../../config";
+// import axios from "axios";
+import axiosInstance, { API_development_environment } from "../../../config";
 import UnfoldLessIcon from '@mui/icons-material/UnfoldLess';
 import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
 
@@ -25,7 +25,7 @@ const RoomConfigList = ({ projectId, roomTypeId, roomTypeName }) => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_development_environment}/api/config/${projectId}/${roomTypeId}/files`,
           {
             headers: {

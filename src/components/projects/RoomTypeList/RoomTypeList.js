@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import RoomElement from "./RoomElement";
 import EditRoomTypeModal from "./EditRoomTypeModal";
 import DeleteRoomTypeModal from "./DeleteRoomTypeModal";
 import CreateRoomTypeModal from "./CreateRoomTypeModal";
-import { API_development_environment } from "../../../config";
+import axiosInstance, { API_development_environment } from "../../../config";
 import { Typography, CircularProgress, Button } from "@mui/material";
 
 const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
@@ -24,7 +24,7 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_development_environment}/api/projects/${projectId}/roomTypes`,
           {
             headers: {
@@ -46,7 +46,7 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
   const handleCreateRoomType = async (name) => {
     const token = localStorage.getItem("authToken");
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `${API_development_environment}/api/projects/${projectId}/roomTypes`,
         { name },
         {
@@ -64,7 +64,7 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
   const handleDeleteRoomType = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      await axios.post(
+      await axiosInstance.post(
         `${API_development_environment}/api/projects/${projectId}/roomTypes/delete`,
         { roomTypeId: selectedRoomType._id },
         {
@@ -92,7 +92,7 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
   const handleSaveRoomType = async (newName) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `${API_development_environment}/api/projects/${projectId}/roomTypes/${selectedRoomType._id}`,
         { name: newName },
         {

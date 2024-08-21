@@ -6,7 +6,7 @@ import PasswordModal from "./PasswordModal";
 import RoomTypeList from "../RoomTypeList/RoomTypeList";
 import RoomConfigList from "../RoomConfigurations/RoomConfigList"; // 导入 RoomConfigList
 import default_image from "../../../assets/images/projects/default_image.jpg";
-import { API_development_environment } from "../../../config";
+import axiosInstance, { API_development_environment } from "../../../config";
 import Alert from "@mui/material/Alert";
 
 const ProjectList = () => {
@@ -31,7 +31,7 @@ const ProjectList = () => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `${API_development_environment}/api/projects`,
           {
             headers: {
@@ -59,14 +59,20 @@ const ProjectList = () => {
 
   const handlePasswordSubmit = async (password) => {
     try {
+      const token = localStorage.getItem('authToken');
       const response = await axios.post(
         `${API_development_environment}/api/projects/verify_password`,
         {
           id: selectedProject._id,
           password: password,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
-
+  
       if (response.status === 200) {
         setAlert({
           severity: "success",
@@ -76,8 +82,8 @@ const ProjectList = () => {
         setTimeout(() => {
           setAlert({ open: false });
           toggleModal();
-          setBreadcrumbPath(["Project List", "Room Types"]); // 更新Breadcrumbs路径
-          setShowRoomTypes(true); // 展示Room Types界面
+          setBreadcrumbPath(["Project List", "Room Types"]);
+          setShowRoomTypes(true);
         }, 1000);
       }
     } catch (error) {
@@ -101,7 +107,7 @@ const ProjectList = () => {
         });
         console.error("Error verifying password:", error);
       }
-
+  
       setTimeout(() => {
         setAlert({ open: false });
       }, 3000);
