@@ -17,6 +17,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import exampleFile from "../../../assets/excel/example.xlsx";
 import { processExcelToJson, splitJsonFile, resetDeviceNameToType } from "./ExcelProcessor/ExcelProcessor"; // 引入处理函数和 resetDeviceNameToType
+import { validateExcel } from "./ExcelProcessor/validation/main"; // 引入新的验证函数
 
 const RoomConfigList = ({ roomTypeName }) => {
   const [file, setFile] = useState(null);
@@ -30,6 +31,24 @@ const RoomConfigList = ({ roomTypeName }) => {
     const lines = jsonResult.split("\n").length;
     setRows(Math.min(Math.max(10, lines), 21)); // at least 10 rows and max 21 rows
   }, [jsonResult]);
+
+  // 检查 Excel 文件的格式
+  const handleCheckExcelFormat = (event) => {
+    event.preventDefault();
+
+    if (!file) {
+      setErrorMessage("Please select a file first.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = new Uint8Array(e.target.result);
+      const validationResult = validateExcel(data);
+      alert(validationResult); // 显示 JSON 数据
+    };
+    reader.readAsArrayBuffer(file);
+  };
 
   // check the type of files && report corresponding error or success message
   const handleFileChange = (event) => {
@@ -142,6 +161,16 @@ const RoomConfigList = ({ roomTypeName }) => {
                   </a>
                 </FormText>
               </FormGroup>
+
+              {/* 检查 Excel 格式按钮 */}
+              <Button
+                style={{ marginRight: "10px", marginBottom: "20px" }}
+                onClick={handleCheckExcelFormat}
+                disabled={!file}
+              >
+                Check Excel Format
+              </Button>
+
               <Button
                 style={{ marginBottom: "20px" }}
                 type="submit"
@@ -149,6 +178,7 @@ const RoomConfigList = ({ roomTypeName }) => {
               >
                 Submit
               </Button>
+              
               {loading && (
                 <Box
                   sx={{
@@ -160,6 +190,7 @@ const RoomConfigList = ({ roomTypeName }) => {
                   <CircularProgress style={{ color: "#fbcd0b" }} />
                 </Box>
               )}
+
               <FormGroup>
                 <Label for="exampleText">JSON Text Area</Label>
                 {successMessage && (
