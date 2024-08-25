@@ -53,11 +53,10 @@ export function processDevices(splitData) {
     const devicesData = [];
     let currentShortname = null;
 
-    // eslint-disable-next-line no-loop-func
-    function isModelMatching(currentShortname, model) {
-        return currentShortname && (model.includes(currentShortname) || currentShortname.includes(model));
+    function isModelMatching(model, shortname) {
+        return shortname && (model.includes(shortname) || shortname.includes(model));
     }
-    
+
     devicesContent.forEach(line => {
         line = line.trim();
 
@@ -69,17 +68,17 @@ export function processDevices(splitData) {
         if (line.startsWith("QTY:")) return;
 
         let deviceType = null;
+        const shortnameForMatching = currentShortname;  // 创建局部变量
 
-        // eslint-disable-next-line no-loop-func
         for (const [dtype, models] of Object.entries(DevicesInSceneControl)) {
             if (Array.isArray(models)) {
-                if (models.some(model => isModelMatching(currentShortname, model))) {
+                if (models.some(model => isModelMatching(model, shortnameForMatching))) {
                     deviceType = dtype;
                     break;
                 }
             } else if (typeof models === 'object') {
                 for (const subType in models) {
-                    if (models[subType].some(model => isModelMatching(currentShortname, model))) {
+                    if (models[subType].some(model => isModelMatching(model, shortnameForMatching))) {
                         deviceType = `${dtype} (${subType})`;
                         break;
                     }
@@ -96,9 +95,9 @@ export function processDevices(splitData) {
             };
             devicesData.push(deviceInfo);
 
-            // Ensure deviceNameToType mapping
+            // 确保 deviceNameToType 映射
             deviceNameToType[line] = deviceType;
-            console.log(`Mapping ${line} to ${deviceType}`); // Debug information
+            console.log(`Mapping ${line} to ${deviceType}`); // 调试信息
         }
     });
 
