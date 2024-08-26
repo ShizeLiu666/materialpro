@@ -61,27 +61,14 @@ export function validateDevices(deviceDataArray) {
     const errors = [];
     const deviceNameToType = {}; // Dictionary to store device names and their corresponding types
     const registeredDeviceNames = new Set(); // Set to track registered device names
-
-    // Populate deviceNameToType dictionary based on DevicesInSceneControl
-    Object.entries(DevicesInSceneControl).forEach(([deviceType, models]) => {
-        if (Array.isArray(models)) {
-            models.forEach(model => {
-                deviceNameToType[model] = deviceType;
-            });
-        } else if (typeof models === 'object') {
-            Object.entries(models).forEach(([subType, subModels]) => {
-                subModels.forEach(model => {
-                    deviceNameToType[model] = `${deviceType} (${subType})`;
-                });
-            });
-        }
-    });
+    let currentDeviceType = null; // Track the current device type
+    let currentDeviceModel = null; // Track the current device model
 
     deviceDataArray.forEach((line, index) => {
         line = line.trim();
 
-        // Skip lines that start with 'QTY:'
-        if (line.startsWith('QTY:')) {
+        // Skip lines that start with 'QTY:' or contain '()'
+        if (line.startsWith('QTY:') || line.includes('(')) {
             return;
         }
 
@@ -90,16 +77,45 @@ export function validateDevices(deviceDataArray) {
         if (line.startsWith('NAME')) {
             //! Validate 'NAME:' prefix and the device model
             if (!checkNamePrefix(line, index, errors)) hasErrors = true;
-            const deviceModel = line.substring(5).trim(); // Extract the part after 'NAME:'
-            if (!validateDeviceModel(deviceModel, index, errors)) hasErrors = true;
+            currentDeviceModel = line.substring(5).trim(); // Extract the part after 'NAME:'
+            if (!validateDeviceModel(currentDeviceModel, index, errors)) hasErrors = true;
 
-        } else if (!hasErrors && checkMissingNamePrefix(line, index, errors, deviceNameToType)) {
+            // Check if the device model is in DevicesInSceneControl
+            for (const [deviceType, models] of Object.entries(DevicesInSceneControl)) {
+                if (Array.isArray(models) && models.includes(currentDeviceModel)) {
+                    currentDeviceType = deviceType;
+                    break;
+                } else if (typeof models === 'object') {
+                    for (const subModels of Object.values(models)) {
+                        if (subModels.includes(currentDeviceModel)) {
+                            currentDeviceType = deviceType;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // If we found a matching device type, record the device name with the correct type
+            if (currentDeviceType) {
+                deviceNameToType[currentDeviceModel] = currentDeviceType; // Use the actual device name as the key
+            } else {
+                errors.push(`Device model '${currentDeviceModel}' at line ${index + 1} is not recognized.`);
+            }
+        } else if (!hasErrors) {
+            //! Check if the line matches a known device model but is missing 'NAME:'
+            if (!checkMissingNamePrefix(line, index, errors, deviceNameToType)) hasErrors = true;
+
             //! Validate device name for uniqueness and format
             if (!validateDeviceName(line, index, errors, registeredDeviceNames)) return;
+
+            // Record the device name with the correct type in deviceNameToType
+            if (currentDeviceType) {
+                deviceNameToType[line] = currentDeviceType; // Use the actual device name as the key
+            }
         }
     });
 
     console.log('Errors found:', errors);  // Debugging line
 
-    return errors;
+    return { errors, deviceNameToType };
 }

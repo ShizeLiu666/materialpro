@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx';
 
 export const DevicesInSceneControl = {
     "Dimmer Type": ["KBSKTDIM", "D300IB", "D300IB2", "DH10VIB", "DM300BH", "D0-10IB", "DDAL"],
-    "Relay Type": ["KBSKTREL", "S2400IB2", "RM1440BH", "KBSKTR", "Z2"],
+    "Relay Type": ["KBSKTREL", "S2400IB2", "RM1440BH", "KBSKTR2400"],
     "Curtain Type": ["C300IBH"],
     "Fan Type": ["FC150A2"],
     "RGB Type": ["KB8RGBG", "KB36RGBS", "KB9TWG", "KB12RGBD", "KB12RGBG"],
