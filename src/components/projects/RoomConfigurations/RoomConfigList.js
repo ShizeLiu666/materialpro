@@ -37,18 +37,23 @@ const RoomConfigList = ({ roomTypeName }) => {
     event.preventDefault();
 
     if (!file) {
-      setErrorMessage("Please select a file first.");
-      return;
+        setErrorMessage("Please select a file first.");
+        return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
-      const validationResult = validateExcel(data);
-      alert(validationResult); // 显示 JSON 数据
+        const data = new Uint8Array(e.target.result);
+        const validationResult = validateExcel(data);
+
+        if (validationResult.length > 0) {
+            alert(validationResult.join('\n')); // Trigger a single alert
+        } else {
+            alert("Validation passed with no errors.");
+        }
     };
     reader.readAsArrayBuffer(file);
-  };
+};
 
   // check the type of files && report corresponding error or success message
   const handleFileChange = (event) => {
