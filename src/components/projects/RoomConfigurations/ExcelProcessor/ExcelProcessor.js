@@ -76,7 +76,7 @@ export function processDevices(splitData) {
         if (line.startsWith("QTY:")) return;
 
         let deviceType = null;
-        const shortnameForMatching = currentShortname;  // 创建局部变量
+        const shortnameForMatching = currentShortname;
 
         for (const [dtype, models] of Object.entries(AllDeviceTypes)) {
             if (Array.isArray(models)) {
@@ -86,7 +86,7 @@ export function processDevices(splitData) {
                 }
             } else if (typeof models === 'object') {
                 for (const subType in models) {
-                    const subModelArray = models[subType];  // 可能是数组，也可能不是
+                    const subModelArray = models[subType];
                     if (Array.isArray(subModelArray) && subModelArray.some(model => isModelMatching(model, shortnameForMatching))) {
                         deviceType = `${dtype} (${subType})`;
                         break;
@@ -104,7 +104,6 @@ export function processDevices(splitData) {
             };
             devicesData.push(deviceInfo);
 
-            // 确保 deviceNameToType 映射
             deviceNameToType[line] = deviceType;
             console.log(`Mapping ${line} to ${deviceType}`); // 调试信息
         }
@@ -237,14 +236,12 @@ function handlePowerPointType(parts, deviceType) {
 function determineDeviceType(deviceName) {
     const originalDeviceName = deviceName.trim().replace(',', '');
 
-    // console.log("Current deviceNameToType mapping:", deviceNameToType);
-    
     if (!originalDeviceName) {
         console.error(`Error: Detected empty or invalid device name: '${originalDeviceName}'`);
         throw new Error("设备名称不能为空。");
     }
 
-    const deviceType = deviceNameToType[originalDeviceName];  // 使用映射表来查找设备类型
+    const deviceType = deviceNameToType[originalDeviceName];
     if (deviceType) {
         return deviceType;
     } else {

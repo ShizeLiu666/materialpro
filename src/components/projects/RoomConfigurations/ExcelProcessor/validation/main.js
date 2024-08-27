@@ -1,6 +1,7 @@
 import { processExcelToJson } from '../ExcelProcessor'; // Import only what you need
 import { validateDevices } from './Devices';
-import { validateGroups  } from './Groups';
+import { validateGroups } from './Groups';
+import { validateScenes } from './Scenes';
 
 function splitJsonFile(content) {
     const splitKeywords = {
@@ -44,10 +45,14 @@ export function validateExcel(fileContent) {
     // Run validations for groups, passing the deviceNameToType
     const groupErrors = validateGroups(splitData.groups, deviceNameToType);
 
+    // Run validations for scenes
+    const sceneErrors = validateScenes(splitData.scenes, deviceNameToType);
+
     // Combine errors from all validations
     const allErrors = [
         ...deviceErrors,
         ...groupErrors,
+        ...sceneErrors,
     ];
 
     return allErrors; // Return all errors

@@ -83,7 +83,7 @@ export function validateGroups(groupDataArray, deviceNameToType) {
     });
 
     console.log('Errors found:', errors);  // Debugging line
-    console.log(deviceNameToGroup); // Debugging the group-device mapping
+    // console.log(deviceNameToGroup); // Debugging the group-device mapping
 
     return errors;
 }
