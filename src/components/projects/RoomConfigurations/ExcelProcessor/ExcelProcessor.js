@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 
-export const DevicesInSceneControl = {
+export const AllDeviceTypes = {
     "Dimmer Type": ["KBSKTDIM", "D300IB", "D300IB2", "DH10VIB", "DM300BH", "D0-10IB", "DDAL"],
     "Relay Type": ["KBSKTREL", "S2400IB2", "RM1440BH", "KBSKTR2400"],
     "Curtain Type": ["C300IBH"],
@@ -9,6 +9,14 @@ export const DevicesInSceneControl = {
     "PowerPoint Type": {
         "Single-Way": ["H1PPWVBX"],
         "Two-Way": ["K2PPHB", "H2PPHB", "H2PPWHB"]
+    },
+    "Remote Control": {
+        "Push Remote Switch": ["H1RSMB", "H2RSMB", "H3RSMB", "H4RSMB", "H14SMB", "H5RSMB", "H6RSMB"]
+    },
+    "Remote Switch": {
+        "5 Input Module": ["5RSIBH"],
+        "6 Input Module": ["6RSIBH"],
+        "4 Output Module": ["4OS2IBH"]
     }
 };
 
@@ -70,7 +78,7 @@ export function processDevices(splitData) {
         let deviceType = null;
         const shortnameForMatching = currentShortname;  // 创建局部变量
 
-        for (const [dtype, models] of Object.entries(DevicesInSceneControl)) {
+        for (const [dtype, models] of Object.entries(AllDeviceTypes)) {
             if (Array.isArray(models)) {
                 if (models.some(model => isModelMatching(model, shortnameForMatching))) {
                     deviceType = dtype;
@@ -78,11 +86,12 @@ export function processDevices(splitData) {
                 }
             } else if (typeof models === 'object') {
                 for (const subType in models) {
-                    if (models[subType].some(model => isModelMatching(model, shortnameForMatching))) {
+                    const subModelArray = models[subType];  // 可能是数组，也可能不是
+                    if (Array.isArray(subModelArray) && subModelArray.some(model => isModelMatching(model, shortnameForMatching))) {
                         deviceType = `${dtype} (${subType})`;
                         break;
                     }
-                }
+                }      
             }
             if (deviceType) break;
         }
