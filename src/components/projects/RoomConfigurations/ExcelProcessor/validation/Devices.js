@@ -93,39 +93,29 @@ export function validateDevices(deviceDataArray) {
 
             // Check if the device model exists in AllDeviceTypes
             let modelExists = false;
-            for (const models of Object.values(AllDeviceTypes)) {
+            currentDeviceType = null; // Reset currentDeviceType for each device
+
+            for (const [deviceType, models] of Object.entries(AllDeviceTypes)) {
                 if (Array.isArray(models) && models.includes(currentDeviceModel)) {
+                    currentDeviceType = deviceType;
                     modelExists = true;
                     break;
-                } else if (typeof models === 'object') {
-                    for (const subModels of Object.values(models)) {
-                        if (subModels.includes(currentDeviceModel)) {
+                } else if (typeof models === 'object') { // 处理有子类型的设备
+                    for (const [subType, subModels] of Object.entries(models)) {
+                        if (Array.isArray(subModels) && subModels.includes(currentDeviceModel)) {
+                            currentDeviceType = `${deviceType} (${subType})`; // 添加子类型到设备类型
                             modelExists = true;
                             break;
                         }
                     }
                 }
+                if (currentDeviceType) break;
             }
 
             //! If the device model doesn't exist, add an error
             if (!modelExists) {
                 errors.push(`KASTA DEVICE: The device model '${currentDeviceModel}' is not recognized in any known device type.`);
                 hasErrors = true;
-            }
-
-            // Object.entries 用于遍历 AllDeviceTypes
-            for (const [deviceType, models] of Object.entries(AllDeviceTypes)) {
-                if (Array.isArray(models) && models.includes(currentDeviceModel)) {
-                    currentDeviceType = deviceType;
-                    break;
-                } else if (typeof models === 'object') { // powerpoint devices
-                    for (const subModels of Object.values(models)) {
-                        if (subModels.includes(currentDeviceModel)) {
-                            currentDeviceType = deviceType;
-                            break;
-                        }
-                    }
-                }
             }
 
             // If we found a matching device type, record the device name with the correct type
@@ -149,6 +139,7 @@ export function validateDevices(deviceDataArray) {
     });
 
     console.log('Errors found:', errors);  // Debugging line
+    console.log('Device Types:', deviceNameToType);  // Debugging line to see the mapping
 
     return { errors, deviceNameToType };
 }

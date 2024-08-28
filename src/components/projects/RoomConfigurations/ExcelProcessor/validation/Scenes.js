@@ -32,7 +32,7 @@ function validateRelayTypeOperations(names, operation, errors, sceneName) {
     const groupOnPattern = /^[a-zA-Z0-9_]+(, [a-zA-Z0-9_]+)* ON$/;
     const groupOffPattern = /^[a-zA-Z0-9_]+(, [a-zA-Z0-9_]+)* OFF$/;
 
-    const operationString = names.join(', ') + ' ' + operation;
+    const operationString = names.join(', ') + ' ' + operation; // 拼接成一个完整的操作字符串
 
     if (
         !singleOnPattern.test(operationString) &&
@@ -40,7 +40,7 @@ function validateRelayTypeOperations(names, operation, errors, sceneName) {
         !groupOnPattern.test(operationString) &&
         !groupOffPattern.test(operationString)
     ) {
-        errors.push(`KASTA SCENE [${sceneName}]: Invalid operation format for Relay Type. Accepted formats are:
+        errors.push(`KASTA SCENE [${sceneName}]: Invalid operation format for Relay Type. The operation string "${operationString}" is not valid. Accepted formats are:
         \n - DEVICE_NAME ON (Single ON)
         \n - DEVICE_NAME OFF (Single OFF)
         \n - DEVICE_NAME_1, DEVICE_NAME_2 ON (Group ON)
@@ -134,7 +134,14 @@ function validateSceneDevicesInLine(parts, errors, deviceNameToType, sceneName) 
     let operation = null;
     let isFanOperation = false; // 用于识别 FAN 类型的操作
 
-    // Step 1: Separate device names, operation parts, and detect FAN operation
+    // Step 1: Check if the line contains a valid operation (ON, OFF, OPEN, CLOSE)
+    if (!parts.some(part => ['ON', 'OFF', 'OPEN', 'CLOSE'].includes(part))) {
+        const instruction = parts.join(' '); // 将 parts 组合成一个完整的指令字符串
+        errors.push(`KASTA SCENE [${sceneName}]: No valid operation (ON, OFF, OPEN, CLOSE) found in the instruction: "${instruction}". Unable to determine command.`);
+        return; // Skip further processing for this line as it doesn't contain a valid operation
+    }    
+
+    // Step 2: Separate device names, operation parts, and detect FAN operation
     parts.forEach(part => {
         if (['ON', 'OFF', 'OPEN', 'CLOSE'].includes(part)) {
             operation = part;
@@ -147,14 +154,26 @@ function validateSceneDevicesInLine(parts, errors, deviceNameToType, sceneName) 
             }
             deviceNames[deviceNames.length - 1].push(part.replace(',', ''));
         } else {
-            if (deviceNames.length === 0) {
-                deviceNames.push([]);
+            if (!/^\d+%$/.test(part)) { // 忽略纯百分比值
+                if (deviceNames.length === 0) {
+                    deviceNames.push([]);
+                }
+                deviceNames[0].push(part.replace(',', ''));
             }
-            deviceNames[0].push(part.replace(',', ''));
         }
     });
 
-    // Step 2: Validate the existence and type of each device
+    // Additional Check: Ensure group operations are properly separated by commas, but skip for FAN operations
+    if (!isFanOperation && deviceNames.flat().length > 1) {
+        const instruction = parts.join(' ');
+        const deviceNamesString = instruction.split(/(ON|OFF|OPEN|CLOSE)/)[0].trim(); // 提取设备名称部分
+        if (!deviceNamesString.split(',').every(name => name.trim().split(/\s+/).length === 1)) {
+            errors.push(`KASTA SCENE [${sceneName}]: Devices in a group must be properly separated by commas and spaces. The instruction "${instruction}" has incorrect separation.`);
+            return; // Skip further processing as the format is incorrect
+        }
+    }
+
+    // Step 3: Validate the existence and type of each device
     deviceNames.forEach(names => {
         const typesInBatch = new Set();
 
@@ -163,37 +182,51 @@ function validateSceneDevicesInLine(parts, errors, deviceNameToType, sceneName) 
             if (deviceType) {
                 typesInBatch.add(deviceType);
                 deviceTypesInLine.add(deviceType);
-            } else if (!isFanOperation && !/^\+\d+%$/.test(name)) {
+            } else if (
+                !isFanOperation &&
+                !/^\+\d+%$/.test(name) &&  // 允许标准的 "+数字%" 格式
+                !/^\d+%$/.test(name) &&     // 允许标准的 "数字%" 格式
+                !/^\+\d+$/.test(name) &&    // 允许标准的 "+数字" 格式
+                !/^\+\w+%$/.test(name)      // 允许 "+字母或数字%" 格式
+            ) {
                 errors.push(`KASTA SCENE [${sceneName}]: The device name '${name}' in the scene is not recognized.`);
             }
+                     
         });
-
-        // Step 3: Validate mixed types in the same batch
+        // Step 4: Validate mixed types in the same batch
         if (typesInBatch.size > 1) {
-            if (!typesInBatch.has("Dimmer Type") || !typesInBatch.has("Relay Type") || typesInBatch.size > 2) {
+            const simplifiedTypesInBatch = new Set([...typesInBatch].map(type => type.split(' ')[0]));
+            if (!simplifiedTypesInBatch.has("Dimmer") || !simplifiedTypesInBatch.has("Relay") || simplifiedTypesInBatch.size > 2) {
                 errors.push(`KASTA SCENE [${sceneName}]: Devices in the same batch must be of the same type, except Dimmer Type and Relay Type can coexist.`);
             }
         }
     });
 
-    // Step 4: Validate operations based on device type using regex
-    if (deviceTypesInLine.has("Relay Type")) {
+    // Step 4: If there are no recognized devices, skip further checks
+    if (deviceNames.flat().length === 0) {
+        return;
+    }
+
+    // Step 5: Validate operations based on device type using regex
+    // Simplify the device type check to handle subtypes
+    const checkDeviceType = (deviceType, baseType) => deviceType.startsWith(baseType);
+
+    if ([...deviceTypesInLine].some(type => checkDeviceType(type, "Relay Type"))) {
         validateRelayTypeOperations(deviceNames.flat(), operation, errors, sceneName);
     }
-    if (deviceTypesInLine.has("Dimmer Type")) {
+    if ([...deviceTypesInLine].some(type => checkDeviceType(type, "Dimmer Type"))) {
         validateDimmerTypeOperations(deviceNames.flat(), operation, errors, sceneName);
     }
-    if (deviceTypesInLine.has("Fan Type")) {
+    if ([...deviceTypesInLine].some(type => checkDeviceType(type, "Fan Type"))) {
         validateFanTypeOperations(parts, errors, sceneName); // 将整个操作传递给 FAN 特定的验证函数
     }
-    if (deviceTypesInLine.has("Curtain Type")) {
+    if ([...deviceTypesInLine].some(type => checkDeviceType(type, "Curtain Type"))) {
         validateCurtainTypeOperations(deviceNames.flat(), operation, errors, sceneName);
     }
-    if (deviceTypesInLine.has("PowerPoint Type")) {
+    if ([...deviceTypesInLine].some(type => checkDeviceType(type, "PowerPoint Type"))) {
         validatePowerPointTypeOperations(parts, errors, sceneName);
     }
 }
-
 
 //! Validate all scenes in the provided data
 export function validateScenes(sceneDataArray, deviceNameToType) {
@@ -218,6 +251,7 @@ export function validateScenes(sceneDataArray, deviceNameToType) {
         }
     });
 
+    console.log(deviceNameToType)
     console.log('Errors found:', errors);  // Debugging line
 
     return errors;
