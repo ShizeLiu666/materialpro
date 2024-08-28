@@ -128,8 +128,7 @@ function validateFanTypeOperations(parts, errors, sceneName) {
 //! Validate Curtain Type operations using regex
 function validateCurtainTypeOperations(names, operation, errors, sceneName) {
     const singleCurtainPattern = /^[a-zA-Z0-9_]+ (OPEN|CLOSE)$/;
-    const groupCurtainPattern =
-        /^[a-zA-Z0-9_]+(,\s*[a-zA-Z0-9_]+)*\s+(OPEN|CLOSE)$/;
+    const groupCurtainPattern = /^[a-zA-Z0-9_]+(,\s*[a-zA-Z0-9_]+)*\s+(OPEN|CLOSE)$/;
 
     const operationString = names.join(", ") + " " + operation;
 
@@ -137,7 +136,7 @@ function validateCurtainTypeOperations(names, operation, errors, sceneName) {
         !singleCurtainPattern.test(operationString) &&
         !groupCurtainPattern.test(operationString)
     ) {
-        errors.push(`KASTA SCENE [${sceneName}]: Invalid operation format for Curtain Type. Accepted formats are:
+        errors.push(`KASTA SCENE [${sceneName}]: Invalid operation format for Curtain Type. The operation string "${operationString}" is not valid. Accepted formats are:
             \n - DEVICE_NAME OPEN (Single Open)
             \n - DEVICE_NAME CLOSE (Single Close)
             \n - DEVICE_NAME_1, DEVICE_NAME_2 OPEN (Group Open)
