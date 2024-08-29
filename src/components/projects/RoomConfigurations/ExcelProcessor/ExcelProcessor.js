@@ -115,43 +115,43 @@ export function processDevices(splitData) {
 const sceneOutputTemplates = {
     "Relay Type": (name, status) => ({
         name,
-        status,
+        status: status === "ON", // 将 ON 转换为 true，OFF 转换为 false
         statusConditions: {}
     }),
     "Curtain Type": (name, status) => ({
         name,
-        status,
+        status: status === "OPEN", // 将 OPEN 转换为 true，CLOSE 转换为 false
         statusConditions: {
             position: status === "OPEN" ? 100 : 0
         }
     }),
     "Dimmer Type": (name, status, level = 100) => ({
         name,
-        status,
+        status: status === "ON", // 将 ON 转换为 true，OFF 转换为 false
         statusConditions: {
             level
         }
     }),
     "Fan Type": (name, status, relay_status, speed) => ({
         name,
-        status,
+        status: status === "ON", // 将 ON 转换为 true，OFF 转换为 false
         statusConditions: {
-            relay: relay_status,
-            speed
+            relay: relay_status === "ON", // 将继电器状态转换为布尔值
+            speed // 保留风速信息
         }
     }),
     "PowerPoint Type": {
         "Two-Way": (name, left_power, right_power) => ({
             name,
             statusConditions: {
-                leftPowerOnOff: left_power,
-                rightPowerOnOff: right_power
+                leftPowerOnOff: left_power === "ON", // 将 ON 转换为 true，OFF 转换为 false
+                rightPowerOnOff: right_power === "ON"
             }
         }),
         "Single-Way": (name, power) => ({
             name,
             statusConditions: {
-                rightPowerOnOff: power
+                rightPowerOnOff: power === "ON" // 将 ON 转换为 true，OFF 转换为 false
             }
         })
     }
@@ -159,26 +159,26 @@ const sceneOutputTemplates = {
 
 function handleFanType(parts) {
     const deviceName = parts[0];
-    const status = parts[1];
-    const relayStatus = parts[3];
-    const speed = parseInt(parts[5], 10);
+    const status = parts[1] === "ON"; // 将 ON 转换为 true，OFF 转换为 false
+    const relayStatus = parts[3] === "ON"; // 将继电器状态转换为布尔值
+    const speed = parseInt(parts[5], 10); // 保留风速信息
     return [sceneOutputTemplates["Fan Type"](deviceName, status, relayStatus, speed)];
 }
 
 function handleDimmerType(parts) {
     const contents = [];
     const statusIndex = parts.findIndex(part => ["ON", "OFF"].includes(part));
-    const status = parts[statusIndex];
+    const status = parts[statusIndex] === "ON"; // 转换为布尔值
 
     let level = 100;
-    if (status === "ON" && parts.length > statusIndex + 1) {
+    if (status && parts.length > statusIndex + 1) { // 只在 ON 时考虑亮度
         try {
             const levelPart = parts[statusIndex + 1].replace("+", "").replace("%", "").trim();
             level = parseInt(levelPart, 10);
         } catch (e) {
             level = 100;
         }
-    } else if (status === "OFF") {
+    } else if (!status) { // OFF 状态亮度设为 0
         level = 0;
     }
 
@@ -192,7 +192,7 @@ function handleDimmerType(parts) {
 
 function handleRelayType(parts) {
     const contents = [];
-    const status = parts[parts.length - 1];
+    const status = parts[parts.length - 1] === "ON"; // 将 ON 转换为 true，OFF 转换为 false
 
     parts.slice(0, -1).forEach(entry => {
         const deviceName = entry.trim().replace(",", "");
@@ -204,7 +204,7 @@ function handleRelayType(parts) {
 
 function handleCurtainType(parts) {
     const contents = [];
-    const status = parts[parts.length - 1];
+    const status = parts[parts.length - 1] === "OPEN"; // 将 OPEN 转换为 true，CLOSE 转换为 false
 
     parts.slice(0, -1).forEach(entry => {
         const deviceName = entry.trim().replace(",", "");
@@ -218,13 +218,13 @@ function handlePowerPointType(parts, deviceType) {
     const contents = [];
 
     if (deviceType.includes("Two-Way")) {
-        const rightPower = parts.pop();
-        const leftPower = parts.pop();
+        const rightPower = parts.pop() === "ON"; // 转换为布尔值
+        const leftPower = parts.pop() === "ON"; // 转换为布尔值
         parts.forEach(deviceName => {
             contents.push(sceneOutputTemplates["PowerPoint Type"]["Two-Way"](deviceName.trim().replace(",", ""), leftPower, rightPower));
         });
     } else if (deviceType.includes("Single-Way")) {
-        const power = parts.pop();
+        const power = parts.pop() === "ON"; // 转换为布尔值
         parts.forEach(deviceName => {
             contents.push(sceneOutputTemplates["PowerPoint Type"]["Single-Way"](deviceName.trim().replace(",", ""), power));
         });
