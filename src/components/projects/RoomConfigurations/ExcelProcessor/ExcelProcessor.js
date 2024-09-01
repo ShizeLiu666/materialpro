@@ -182,6 +182,8 @@ function handleDimmerType(parts) {
         level = 0;
     }
 
+    console.log(`Dimmer Type - Status: ${status}, Level: ${level}`);
+
     parts.slice(0, statusIndex).forEach(entry => {
         const deviceName = entry.trim().replace(",", "");
         try {
@@ -203,6 +205,8 @@ function handleDimmerType(parts) {
 function handleRelayType(parts) {
     const contents = [];
     const status = parts[parts.length - 1] === "ON"; // 将状态转换为布尔值
+
+    console.log(`Relay Type - Status: ${status}`);
 
     parts.slice(0, -1).forEach(entry => {
         const deviceName = entry.trim().replace(",", "");
