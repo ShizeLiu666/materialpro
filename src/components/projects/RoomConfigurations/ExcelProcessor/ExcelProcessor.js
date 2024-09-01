@@ -168,7 +168,7 @@ function handleFanType(parts) {
 function handleDimmerType(parts) {
     const contents = [];
     const statusIndex = parts.findIndex(part => ["ON", "OFF"].includes(part));
-    const status = parts[statusIndex] === "ON"; // 转换为布尔值
+    const status = parts[statusIndex] === "ON"; // 将状态转换为布尔值
 
     let level = 100;
     if (status && parts.length > statusIndex + 1) { // 只在 ON 时考虑亮度
@@ -184,19 +184,39 @@ function handleDimmerType(parts) {
 
     parts.slice(0, statusIndex).forEach(entry => {
         const deviceName = entry.trim().replace(",", "");
-        contents.push(sceneOutputTemplates["Dimmer Type"](deviceName, status, level));
+        try {
+            const deviceType = determineDeviceType(deviceName);
+            if (deviceType === "Relay Type") { // 判断是否是继电器设备
+                contents.push(sceneOutputTemplates["Relay Type"](deviceName, status));
+            } else {
+                contents.push(sceneOutputTemplates["Dimmer Type"](deviceName, status, level));
+            }
+        } catch (e) {
+            console.warn(`Skipping device due to error: ${e.message}`);
+        }
     });
 
     return contents;
 }
 
+
 function handleRelayType(parts) {
     const contents = [];
-    const status = parts[parts.length - 1] === "ON"; // 将 ON 转换为 true，OFF 转换为 false
+    const status = parts[parts.length - 1] === "ON"; // 将状态转换为布尔值
 
     parts.slice(0, -1).forEach(entry => {
         const deviceName = entry.trim().replace(",", "");
-        contents.push(sceneOutputTemplates["Relay Type"](deviceName, status));
+        try {
+            const deviceType = determineDeviceType(deviceName);
+            if (deviceType === "Dimmer Type") { // 判断是否是调光器设备
+                const level = status ? 100 : 0; // 如果是调光器，ON 为 100，OFF 为 0
+                contents.push(sceneOutputTemplates["Dimmer Type"](deviceName, status, level));
+            } else {
+                contents.push(sceneOutputTemplates["Relay Type"](deviceName, status));
+            }
+        } catch (e) {
+            console.warn(`Skipping device due to error: ${e.message}`);
+        }
     });
 
     return contents;
