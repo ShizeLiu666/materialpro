@@ -115,43 +115,43 @@ export function processDevices(splitData) {
 const sceneOutputTemplates = {
     "Relay Type": (name, status) => ({
         name,
-        status: status === "ON", // 将 ON 转换为 true，OFF 转换为 false
-        statusConditions: {}
+        status, // 已经是布尔值，直接使用
+        statusConditions: {} // Relay Type 通常没有额外的状态条件
     }),
     "Curtain Type": (name, status) => ({
         name,
-        status: status === "OPEN", // 将 OPEN 转换为 true，CLOSE 转换为 false
+        status, // 已经是布尔值，直接使用
         statusConditions: {
-            position: status === "OPEN" ? 100 : 0
+            position: status ? 100 : 0 // OPEN 为 true 时，位置为 100；CLOSE 为 false 时，位置为 0
         }
     }),
     "Dimmer Type": (name, status, level = 100) => ({
         name,
-        status: status === "ON", // 将 ON 转换为 true，OFF 转换为 false
+        status, // 已经是布尔值，直接使用
         statusConditions: {
-            level
+            level // 亮度值由外部传入，默认为 100
         }
     }),
     "Fan Type": (name, status, relay_status, speed) => ({
         name,
-        status: status === "ON", // 将 ON 转换为 true，OFF 转换为 false
+        status, // 已经是布尔值，直接使用
         statusConditions: {
-            relay: relay_status === "ON", // 将继电器状态转换为布尔值
-            speed // 保留风速信息
+            relay: relay_status, // relay_status 已经是布尔值
+            speed // 风速值由外部传入
         }
     }),
     "PowerPoint Type": {
         "Two-Way": (name, left_power, right_power) => ({
             name,
             statusConditions: {
-                leftPowerOnOff: left_power === "ON", // 将 ON 转换为 true，OFF 转换为 false
-                rightPowerOnOff: right_power === "ON"
+                leftPowerOnOff: left_power, // 左侧电源状态，布尔值
+                rightPowerOnOff: right_power // 右侧电源状态，布尔值
             }
         }),
         "Single-Way": (name, power) => ({
             name,
             statusConditions: {
-                rightPowerOnOff: power === "ON" // 将 ON 转换为 true，OFF 转换为 false
+                rightPowerOnOff: power // 单路电源状态，布尔值
             }
         })
     }
@@ -182,7 +182,7 @@ function handleDimmerType(parts) {
         level = 0;
     }
 
-    console.log(`Dimmer Type - Status: ${status}, Level: ${level}`);
+    // console.log(`Dimmer Type - Status: ${status}, Level: ${level}`);
 
     parts.slice(0, statusIndex).forEach(entry => {
         const deviceName = entry.trim().replace(",", "");
@@ -206,7 +206,7 @@ function handleRelayType(parts) {
     const contents = [];
     const status = parts[parts.length - 1] === "ON"; // 将状态转换为布尔值
 
-    console.log(`Relay Type - Status: ${status}`);
+    // console.log(`Relay Type - Status: ${status}`);
 
     parts.slice(0, -1).forEach(entry => {
         const deviceName = entry.trim().replace(",", "");
