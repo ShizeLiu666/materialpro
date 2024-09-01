@@ -159,11 +159,17 @@ const sceneOutputTemplates = {
 
 function handleFanType(parts) {
     const deviceName = parts[0];
-    const status = parts[1] === "ON"; // 将 ON 转换为 true，OFF 转换为 false
-    const relayStatus = parts[3] === "ON"; // 将继电器状态转换为布尔值
-    const speed = parseInt(parts[5], 10); // 保留风速信息
+    const status = parts[1] === "ON"; // 风扇开关状态：ON 为 true，OFF 为 false
+    const relayStatus = parts[3] === "ON"; // 继电器开关状态：ON 为 true，OFF 为 false
+    let speed = status ? 1 : 0; // 默认速度：ON 为 1，OFF 为 0
+
+    if (parts.length > 5 && parts[4] === "SPEED") {
+        speed = parseInt(parts[5], 10); // 如果提供了速度，使用提供的速度值
+    }
+
     return [sceneOutputTemplates["Fan Type"](deviceName, status, relayStatus, speed)];
 }
+
 
 function handleDimmerType(parts) {
     const contents = [];
