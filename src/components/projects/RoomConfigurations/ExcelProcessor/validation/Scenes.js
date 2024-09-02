@@ -182,9 +182,9 @@ function validatePowerPointTypeOperations(
   const operationParts = parts.slice(operationIndex);
 
   // 调试输出
-  console.log("Device Names:", deviceNames);
-  console.log("Operation Parts:", operationParts);
-  console.log("deviceNameToType:", deviceNameToType);
+  // console.log("Device Names:", deviceNames);
+  // console.log("Operation Parts:", operationParts);
+  // console.log("deviceNameToType:", deviceNameToType);
 
   // 检查设备类型是否一致
   const deviceTypes = new Set(
@@ -244,6 +244,29 @@ function validatePowerPointTypeOperations(
             \n - DEVICE_NAME ON ON (Two-way ON ON)
             \n - DEVICE_NAME OFF OFF (Two-way OFF OFF)
             \n - DEVICE_NAME_1, DEVICE_NAME_ ON OFF (Group ON OFF)`);
+  }
+}
+
+//! Validate Dry Contact Type operations using regex
+function validateDryContactTypeOperations(names, operation, errors, sceneName) {
+  const singleOnPattern = /^[a-zA-Z0-9_]+ ON$/;
+  const singleOffPattern = /^[a-zA-Z0-9_]+ OFF$/;
+  const groupOnPattern = /^[a-zA-Z0-9_]+(, [a-zA-Z0-9_]+)* ON$/;
+  const groupOffPattern = /^[a-zA-Z0-9_]+(, [a-zA-Z0-9_]+)* OFF$/;
+
+  const operationString = names.join(", ") + " " + operation;
+
+  if (
+    !singleOnPattern.test(operationString) &&
+    !singleOffPattern.test(operationString) &&
+    !groupOnPattern.test(operationString) &&
+    !groupOffPattern.test(operationString)
+  ) {
+    errors.push(`KASTA SCENE [${sceneName}]: Invalid operation format for Dry Contact Type. The operation string "${operationString}" is not valid. Accepted formats are:
+            \n - DEVICE_NAME ON (Single ON)
+            \n - DEVICE_NAME OFF (Single OFF)
+            \n - DEVICE_NAME_1, DEVICE_NAME_2 ON (Group ON)
+            \n - DEVICE_NAME_1, DEVICE_NAME_2 OFF (Group OFF)`);
   }
 }
 
@@ -332,7 +355,6 @@ function validateSceneDevicesInLine(
 
     const instruction = parts.join(" "); // 将指令行连接成一个字符串
     // Allow PowerPoint Types to be treated in a special case
-    // 确保 Relay 和 Dimmer 共存的条件
     if (
       simplifiedTypesInBatch.size > 1 &&
       !(
@@ -346,7 +368,6 @@ function validateSceneDevicesInLine(
       const containsDimmingOperation = /\+\d+%/.test(instruction);
 
       if (containsDimmerAndRelay && !containsDimmingOperation) {
-        // 如果包含 Dimmer 和 Relay 且没有调光操作，可以共存
         return;
       } else {
         errors.push(
@@ -405,6 +426,16 @@ function validateSceneDevicesInLine(
     );
   }
   if (
+    [...deviceTypesInLine].some((type) => checkDeviceType(type, "Dry Contact"))
+  ) {
+    validateDryContactTypeOperations(
+      deviceNames.flat(),
+      operation,
+      errors,
+      sceneName
+    );
+  }
+  if (
     [...deviceTypesInLine].some((type) =>
       checkDeviceType(type, "PowerPoint Type")
     )
@@ -417,6 +448,7 @@ function validateSceneDevicesInLine(
     );
   }
 }
+
 
 //! Validate all scenes in the provided data
 export function validateScenes(sceneDataArray, deviceNameToType) {

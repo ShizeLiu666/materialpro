@@ -10,6 +10,7 @@ export const AllDeviceTypes = {
         "Single-Way": ["H1PPWVBX"],
         "Two-Way": ["K2PPHB", "H2PPHB", "H2PPWHB"]
     },
+    "Dry Contact": ["S10IBH"],
     "Remote Control": {
         "1 Push Panel": ["H1RSMB"],
         "2 Push Panel": ["H2RSMB"],
@@ -210,7 +211,6 @@ function handleDimmerType(parts) {
     return contents;
 }
 
-
 function handleRelayType(parts) {
     const contents = [];
     const status = parts[parts.length - 1] === "ON"; // 将状态转换为布尔值
@@ -242,6 +242,18 @@ function handleCurtainType(parts) {
     parts.slice(0, -1).forEach(entry => {
         const deviceName = entry.trim().replace(",", "");
         contents.push(sceneOutputTemplates["Curtain Type"](deviceName, status));
+    });
+
+    return contents;
+}
+
+function handleDryContactType(parts) {
+    const contents = [];
+    const status = parts[parts.length - 1] === "ON"; // 将状态转换为布尔值
+
+    parts.slice(0, -1).forEach(entry => {
+        const deviceName = entry.trim().replace(",", "");
+        contents.push(sceneOutputTemplates["Relay Type"](deviceName, status)); // Dry Contact 类型和 Relay 类型处理类似
     });
 
     return contents;
@@ -306,6 +318,8 @@ export function parseSceneContent(sceneName, contentLines) {
                 } else if (deviceType.includes("Single-Way")) {
                     contents.push(...handlePowerPointType(parts, "Single-Way PowerPoint Type"));
                 }
+            } else if (deviceType === "Dry Contact") {  // 添加对 Dry Contact 的处理
+                contents.push(...handleDryContactType(parts));
             }
         } catch (e) {
             console.warn(`Skipping line due to error: ${e.message}`);
