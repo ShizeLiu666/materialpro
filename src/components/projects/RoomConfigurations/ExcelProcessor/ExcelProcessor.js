@@ -11,13 +11,16 @@ export const AllDeviceTypes = {
         "Two-Way": ["K2PPHB", "H2PPHB", "H2PPWHB"]
     },
     "Remote Control": {
-        "Push Remote Switch": ["H1RSMB", "H2RSMB", "H3RSMB", "H4RSMB", "H14SMB", "H5RSMB", "H6RSMB"]
+        "1 Push Panel": ["H1RSMB"],
+        "2 Push Panel": ["H2RSMB"],
+        "3 Push Panel": ["H3RSMB"],
+        "4 Push Panel": ["H4RSMB"],
+        "5 Push Panel": ["H5RSMB", "H14SMB"], // H14SMB added as a 5 Push Panel
+        "6 Push Panel": ["H6RSMB"]
     },
-    "Remote Switch": {
-        "5 Input Module": ["5RSIBH"],
-        "6 Input Module": ["6RSIBH"],
-        "4 Output Module": ["4OS2IBH"]
-    }
+    "5 Input Module": ["5RSIBH"],
+    "6 Input Module": ["6RSIBH"],
+    "4 Output Module": ["4OS2IBH"]
 };
 
 let deviceNameToType = {};

@@ -7,7 +7,7 @@ function checkNamePrefix(line, errors) {
     return true;
 }
 
-function validateGroupName(groupName, errors, deviceNameToGroup) {
+function validateGroupName(groupName, errors, deviceNameToGroup, registeredGroupNames) {
     //! Check for 'NAME' without a colon
     if (!groupName) {
         errors.push(`KASTA GROUP: The line with 'NAME:' is missing a group name. Please enter a valid group name.`);
@@ -24,6 +24,7 @@ function validateGroupName(groupName, errors, deviceNameToGroup) {
         deviceNameToGroup[groupName] = new Set(); // Initialize a new Set for this group
     }
 
+    registeredGroupNames.add(groupName);
     return true;
 }
 
@@ -66,6 +67,7 @@ function validateDeviceNameInGroup(deviceName, errors, deviceNameToType, deviceN
 export function validateGroups(groupDataArray, deviceNameToType) {
     const errors = [];
     const deviceNameToGroup = {}; // Store device names within each group
+    const registeredGroupNames = new Set(); // track registered group names
     let currentGroupName = null;
 
     groupDataArray.forEach((line) => {
@@ -74,7 +76,7 @@ export function validateGroups(groupDataArray, deviceNameToType) {
         if (line.startsWith('NAME')) {
             if (!checkNamePrefix(line, errors)) return;
             currentGroupName = line.substring(5).trim(); // Extract the part after 'NAME:'
-            if (!validateGroupName(currentGroupName, errors, deviceNameToGroup)) return;
+            if (!validateGroupName(currentGroupName, errors, deviceNameToGroup, registeredGroupNames)) return;
         } else if (line.startsWith('DEVICE CONTROL:')) {
             return; // Skip this line as it just indicates the start of device names
         } else if (currentGroupName && line) {
@@ -85,5 +87,5 @@ export function validateGroups(groupDataArray, deviceNameToType) {
     console.log('Errors found:', errors);  // Debugging line
     // console.log(deviceNameToGroup); // Debugging the group-device mapping
 
-    return errors;
+    return { errors, registeredGroupNames };
 }

@@ -141,5 +141,5 @@ export function validateDevices(deviceDataArray) {
     console.log('Errors found:', errors);  // Debugging line
     console.log('Device Types:', deviceNameToType);  // Debugging line to see the mapping
 
-    return { errors, deviceNameToType };
+    return { errors, deviceNameToType, registeredDeviceNames };
 }

@@ -2,6 +2,7 @@ import { processExcelToJson } from '../ExcelProcessor'; // Import only what you 
 import { validateDevices } from './Devices';
 import { validateGroups } from './Groups';
 import { validateScenes } from './Scenes';
+import { validateRemoteControls } from './RemoteControls'; // 新增的导入
 
 function splitJsonFile(content) {
     const splitKeywords = {
@@ -48,11 +49,15 @@ export function validateExcel(fileContent) {
     // Run validations for scenes
     const sceneErrors = validateScenes(splitData.scenes, deviceNameToType);
 
+    // Run validations for remote controls
+    const remoteControlErrors = validateRemoteControls(splitData.remoteControls, deviceNameToType);
+
     // Combine errors from all validations
     const allErrors = [
         ...deviceErrors,
         ...groupErrors,
         ...sceneErrors,
+        ...remoteControlErrors, // 将 remoteControlErrors 合并
     ];
 
     return allErrors; // Return all errors
