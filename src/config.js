@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 export const API_development_environment = 'http://localhost:8000';
+export const kastacloud_environment = 'http://kastacloud.com';
 
 // 创建 axios 实例
 const axiosInstance = axios.create({
