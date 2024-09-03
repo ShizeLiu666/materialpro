@@ -5,8 +5,8 @@ const deviceModelToKeyCount = {
     "4 Push Panel": 4,
     "5 Push Panel": 5,
     "6 Push Panel": 6,
-    "5 Input Module": 5,
-    "6 Input Module": 6,
+    "5 Input Module": 4,
+    "6 Input Module": 4,
     "4 Output Module": 4
 };
 

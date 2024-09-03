@@ -77,7 +77,7 @@ export function validateGroups(groupDataArray, deviceNameToType) {
             if (!checkNamePrefix(line, errors)) return;
             currentGroupName = line.substring(5).trim(); // Extract the part after 'NAME:'
             if (!validateGroupName(currentGroupName, errors, deviceNameToGroup, registeredGroupNames)) return;
-        } else if (line.startsWith('DEVICE CONTROL:')) {
+        } else if (line.startsWith('DEVICE CONTROL')) {
             return; // Skip this line as it just indicates the start of device names
         } else if (currentGroupName && line) {
             if (!validateDeviceNameInGroup(line, errors, deviceNameToType, deviceNameToGroup, currentGroupName)) return; // Check against deviceNameToType

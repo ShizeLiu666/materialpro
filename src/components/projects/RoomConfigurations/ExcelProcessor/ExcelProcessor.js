@@ -16,7 +16,7 @@ export const AllDeviceTypes = {
         "2 Push Panel": ["H2RSMB"],
         "3 Push Panel": ["H3RSMB"],
         "4 Push Panel": ["H4RSMB"],
-        "5 Push Panel": ["H5RSMB", "H14SMB"], // H14SMB added as a 5 Push Panel
+        "5 Push Panel": ["H5RSMB", "H14SMB"],
         "6 Push Panel": ["H6RSMB"]
     },
     "5 Input Module": ["5RSIBH"],
@@ -35,7 +35,7 @@ export function extractTextFromSheet(sheet) {
     sheet.forEach(row => {
         row.forEach(cellValue => {
             if (cellValue && typeof cellValue === 'string') {
-                let value = cellValue.replace('（', '(').replace('）', ')').replace('：', ':');
+                let value = cellValue.replace(/（/g, '(').replace(/）/g, ')').replace(/：/g, ':');
                 value = value.replace(/\(.*?\)/g, '');
                 value.split('\n').forEach(text => {
                     if (text.trim()) textList.push(text.trim());
@@ -367,7 +367,7 @@ export function processGroups(splitData) {
             return;
         }
 
-        if (line.startsWith("DEVICE CONTROL:")) return;
+        if (line.startsWith("DEVICE CONTROL")) return;
 
         if (currentGroup) {
             groupsData.push({
@@ -405,7 +405,7 @@ export function processRemoteControls(splitData) {
 
             const linkIndex = parseInt(parts[0].trim(), 10) - 1;
             let linkDescription = parts[1].trim();
-            let action = "NORMAL";
+            let action = false;
 
             if (linkDescription.includes(" - ")) {
                 [linkDescription, action] = linkDescription.split(" - ");

@@ -27,23 +27,32 @@ function validateDeviceModel(deviceModel, errors) {
 
 //! Check if the line matches a known device model but is missing 'NAME:'
 function checkMissingNamePrefix(line, errors) {
-    // Check if the line matches any known device model from AllDeviceTypes
+    // 检查当前行是否与 AllDeviceTypes 中的任何设备型号完全匹配
     for (const deviceType in AllDeviceTypes) {
         const models = AllDeviceTypes[deviceType];
-        if (Array.isArray(models) && models.includes(line)) {
-            errors.push(`KASTA DEVICE: The device model '${line}' seems to be missing the 'NAME: ' prefix. It should be formatted as 'NAME: ${line}'.`);
-            return false;
-        } else if (typeof models === 'object') {
-            for (const subModels of Object.values(models)) {
-                if (subModels.includes(line)) {
+        if (Array.isArray(models)) {
+            models.forEach(model => {
+                if (model === line) {
+                    console.log(`Matched with model: '${model}' in deviceType: '${deviceType}'`);
                     errors.push(`KASTA DEVICE: The device model '${line}' seems to be missing the 'NAME: ' prefix. It should be formatted as 'NAME: ${line}'.`);
                     return false;
                 }
+            });
+        } else if (typeof models === 'object') {
+            for (const [subType, subModels] of Object.entries(models)) {
+                subModels.forEach(subModel => {
+                    if (subModel === line) {
+                        console.log(`Matched with subModel: '${subModel}' in subType: '${subType}' under deviceType: '${deviceType}'`);
+                        errors.push(`KASTA DEVICE: The device model '${line}' seems to be missing the 'NAME: ' prefix. It should be formatted as 'NAME: ${line}'.`);
+                        return false;
+                    }
+                });
             }
         }
     }
     return true;
 }
+
 
 //! Check for duplicate device name and invalid formats
 function validateDeviceName(line, errors, registeredDeviceNames) {
@@ -86,45 +95,42 @@ export function validateDevices(deviceDataArray) {
         let hasErrors = false;
 
         if (line.startsWith('NAME')) {
-            //! Validate 'NAME:' prefix and the device model
+            // 验证 'NAME:' 前缀和设备型号
             if (!checkNamePrefix(line, errors)) hasErrors = true;
-            currentDeviceModel = line.substring(5).trim(); // Extract the part after 'NAME:'
+            currentDeviceModel = line.substring(5).trim(); // 提取 'NAME:' 之后的部分
             if (!validateDeviceModel(currentDeviceModel, errors)) hasErrors = true;
-
-            // Check if the device model exists in AllDeviceTypes
+        
+            // 检查设备型号是否存在于 AllDeviceTypes 中
             let modelExists = false;
-            currentDeviceType = null; // Reset currentDeviceType for each device
-
+            currentDeviceType = null; // 重置 currentDeviceType
+        
             for (const [deviceType, models] of Object.entries(AllDeviceTypes)) {
                 if (Array.isArray(models) && models.includes(currentDeviceModel)) {
                     currentDeviceType = deviceType;
                     modelExists = true;
                     break;
-                } else if (typeof models === 'object') { // 处理有子类型的设备
+                } else if (typeof models === 'object') { // 处理子类型的情况
                     for (const [subType, subModels] of Object.entries(models)) {
                         if (Array.isArray(subModels) && subModels.includes(currentDeviceModel)) {
-                            currentDeviceType = `${deviceType} (${subType})`; // 添加子类型到设备类型
+                            currentDeviceType = `${deviceType} (${subType})`; // 将子类型添加到设备类型
                             modelExists = true;
                             break;
                         }
                     }
                 }
-                if (currentDeviceType) break;
+                if (modelExists) break; // 在找到匹配型号后跳出循环
             }
-
-            //! If the device model doesn't exist, add an error
+        
+            // 如果设备型号不存在，添加错误
             if (!modelExists) {
                 errors.push(`KASTA DEVICE: The device model '${currentDeviceModel}' is not recognized in any known device type.`);
                 hasErrors = true;
-            }
-
-            // If we found a matching device type, record the device name with the correct type
-            if (currentDeviceType && currentDeviceModel) {
-                deviceNameToType[currentDeviceModel] = currentDeviceType; // Use the actual device name as the key
             } else {
-                errors.push(`KASTA DEVICE: The device model '${currentDeviceModel}' is not recognized.`);
+                // 记录设备型号与设备类型的映射
+                deviceNameToType[currentDeviceModel] = currentDeviceType;
             }
-        } else if (!hasErrors) {
+        }
+         else if (!hasErrors) {
             //! Check if the line matches a known device model but is missing 'NAME:'
             if (!checkMissingNamePrefix(line, errors)) hasErrors = true;
 

@@ -40,6 +40,10 @@ export function validateExcel(fileContent) {
 
     const splitData = splitJsonFile(allTextData["programming details"]); 
 
+    console.log('****************************************************************');
+    console.log(splitData);
+    console.log('****************************************************************');
+
     // Run validations for devices and capture deviceNameToType
     const { errors: deviceErrors, deviceNameToType, registeredDeviceNames } = validateDevices(splitData.devices);
 
