@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 import kastaLogo from "../../assets/images/logos/kasta_logo.png";
-import { kastacloud_environment } from "../../config";
+// import { kastacloud_environment } from "../../config";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -19,7 +19,7 @@ const LoginPage = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        `${kastacloud_environment}/api/users/login`,
+        "/api/users/login",
         {
           username,
           password,
@@ -31,10 +31,7 @@ const LoginPage = () => {
 
         // 将 token 存储在 localStorage 中
         localStorage.setItem("authToken", token);
-
-        // 打印 token，方便调试
         console.log("Received token:", token);
-
         // 跳转到管理员项目页面
         navigate("/admin/projects");
       } else {
@@ -87,7 +84,7 @@ const LoginPage = () => {
 
                         <div className="form-outline mb-4 position-relative">
                           <input
-                            type={showPassword ? "text" : "password"} // 动态设置input类型
+                            type={showPassword ? "text" : "password"}
                             id="password"
                             className="form-control"
                             placeholder="Password"
@@ -107,7 +104,6 @@ const LoginPage = () => {
                             }}
                           >
                             {showPassword ? "🔓" : "🔒"}{" "}
-                            {/* 简单的眼睛图标，可以替换为更复杂的图标 */}
                           </span>
                         </div>
 

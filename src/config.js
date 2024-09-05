@@ -5,7 +5,7 @@ export const kastacloud_environment = 'http://kastacloud.com';
 
 // 创建 axios 实例
 const axiosInstance = axios.create({
-  baseURL: API_development_environment,
+  baseURL: kastacloud_environment,
 });
 
 // 配置拦截器
