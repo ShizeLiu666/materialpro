@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
-import axios from "axios";
+import axios from "axios";  // 直接使用 axios
 import ProjectCard from "./ProjectCard";
 import PasswordModal from "./PasswordModal";
 import RoomTypeList from "../RoomTypeList/RoomTypeList";
 import RoomConfigList from "../RoomConfigurations/RoomConfigList"; // 导入 RoomConfigList
 import default_image from "../../../assets/images/projects/default_image.jpg";
-import axiosInstance, { API_development_environment } from "../../../config";
 import Alert from "@mui/material/Alert";
 
 const ProjectList = () => {
@@ -30,21 +29,35 @@ const ProjectList = () => {
           console.error("No token found, please log in again.");
           return;
         }
-
-        const response = await axiosInstance.get(
-          `${API_development_environment}/api/projects`,
+  
+        // 通过代理直接调用 `/api/projects`，无需 baseURL
+        const response = await axios.get(
+          "/api/projects",
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`, // 发送 token 确定用户的可访问项目
             },
           }
         );
-        setProjects(response.data);
+
+        if (response.data.success) {
+          const projects = response.data.data.map((project) => ({
+            projectId: project.projectId,
+            name: project.name,
+            password: project.password,
+            iconUrl: project.iconUrl,
+            address: project.address,
+            role: project.role,
+          }));
+          setProjects(projects);
+        } else {
+          console.error("Error fetching projects:", response.data.errorMsg);
+        }
       } catch (error) {
         console.error("Error fetching projects:", error);
       }
     };
-
+  
     fetchProjectList();
   }, []);
 
@@ -59,21 +72,8 @@ const ProjectList = () => {
 
   const handlePasswordSubmit = async (password) => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.post(
-        `${API_development_environment}/api/projects/verify_password`,
-        {
-          id: selectedProject._id,
-          password: password,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      if (response.status === 200) {
+      // 不再需要请求服务器，只做密码比较
+      if (password === selectedProject.password) {
         setAlert({
           severity: "success",
           message: `Password for ${selectedProject.name} is correct!`,
@@ -81,38 +81,33 @@ const ProjectList = () => {
         });
         setTimeout(() => {
           setAlert({ open: false });
-          toggleModal();
-          setBreadcrumbPath(["Project List", "Room Types"]);
-          setShowRoomTypes(true);
+          toggleModal();  // 关闭模态框
+          setBreadcrumbPath(["Project List", "Room Types"]);  // 更新面包屑导航
+          setShowRoomTypes(true);  // 显示房间类型列表
         }, 1000);
-      }
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
+      } else {
+        // 如果密码不匹配，显示错误消息
         setAlert({
           severity: "error",
           message: `Incorrect password for ${selectedProject.name}.`,
           open: true,
         });
-      } else if (error.response && error.response.status === 404) {
-        setAlert({
-          severity: "error",
-          message: `Project ${selectedProject.name} not found.`,
-          open: true,
-        });
-      } else {
-        setAlert({
-          severity: "error",
-          message: "An error occurred. Please try again later.",
-          open: true,
-        });
-        console.error("Error verifying password:", error);
       }
-  
-      setTimeout(() => {
-        setAlert({ open: false });
-      }, 3000);
+    } catch (error) {
+      // 处理其他意外错误
+      setAlert({
+        severity: "error",
+        message: "An error occurred. Please try again later.",
+        open: true,
+      });
+      console.error("Error verifying password:", error);
     }
-  };
+  
+    // 3秒后关闭提示框
+    setTimeout(() => {
+      setAlert({ open: false });
+    }, 3000);
+  };  
 
   const handleBreadcrumbClick = () => {
     setBreadcrumbPath(["Project List"]);
@@ -122,7 +117,6 @@ const ProjectList = () => {
   const handleNavigate = (newPath, roomTypeId, roomTypeName) => {
     setBreadcrumbPath(newPath);
     setSelectedRoomType({ id: roomTypeId, name: roomTypeName });
-    // console.log("Breadcrumb Path Updated:", newPath);
   };
 
   return (
@@ -200,7 +194,7 @@ const ProjectList = () => {
             <Col sm="6" lg="6" xl="4" key={index}>
               <div onClick={() => handleCardClick(project)}>
                 <ProjectCard
-                  image={default_image}
+                  image={project.iconUrl ? project.iconUrl : default_image}
                   title={project.name}
                   subtitle={project.address}
                   color="primary"
@@ -213,7 +207,7 @@ const ProjectList = () => {
 
       {showRoomTypes && selectedProject && breadcrumbPath.length === 2 && (
         <RoomTypeList
-          projectId={selectedProject._id}
+          projectId={selectedProject.projectId}
           projectName={selectedProject.name}
           onNavigate={handleNavigate}
         />

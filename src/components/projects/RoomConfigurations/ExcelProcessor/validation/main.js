@@ -62,13 +62,17 @@ export function validateExcel(fileContent) {
         registeredSceneNames
     );
 
-    // Combine errors from all validations
+    // 在每个错误数组后添加空字符串表示的空行
     const allErrors = [
         ...deviceErrors,
+        '', // 空行分隔设备错误和其他错误
         ...groupErrors,
+        '', // 空行分隔组错误和其他错误
         ...sceneErrors,
-        ...remoteControlErrors, // 将 remoteControlErrors 合并
+        '', // 空行分隔场景错误和其他错误
+        ...remoteControlErrors
     ];
 
-    return allErrors; // Return all errors
+    // 返回所有错误，带有空行分隔
+    return allErrors.filter(Boolean); // 过滤掉空数组或空字符串
 }

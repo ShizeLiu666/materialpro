@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Navbar,
@@ -24,8 +24,17 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [username, setUsername] = useState(""); // 用于存储用户名
   const navigate = useNavigate();
   const { resetState } = useExcelConverter(); // 从 useExcelConverter 解构 resetState
+
+  // 在组件加载时从 localStorage 中获取用户名
+  useEffect(() => {
+    const storedUsername = localStorage.getItem("username");
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
 
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   const Handletoggle = () => setIsOpen(!isOpen);
@@ -73,7 +82,10 @@ const Header = () => {
         </Nav>
         <Dropdown isOpen={dropdownOpen} toggle={toggle}>
           <DropdownToggle color="transparent" className="d-flex align-items-center">
-            <span className="me-2" style={{ color: 'black', fontSize: '20px' }}>Hi, UserName!</span>
+            {/* 使用 state 中的 username 动态显示用户名 */}
+            <span className="me-2" style={{ color: 'black', fontSize: '20px' }}>
+              {username ? `Hi, ${username}` : "Hi, User"}
+            </span>
             <img
               src={user1}
               alt="profile"

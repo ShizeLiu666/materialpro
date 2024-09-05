@@ -18,7 +18,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import axios from "axios";
 import exampleFile from "../../assets/excel/example.xlsx";
-import { API_development_environment } from "../../config";
+// import { API_development_environment } from "../../config";
 
 const ExcelConverter = () => {
   const { jsonResult, setJsonResult } = useExcelConverter();
@@ -68,7 +68,7 @@ const ExcelConverter = () => {
 
     try {
       const response = await axios.post(
-        `${API_development_environment}/api/excelToJson/convert`,
+        `/api/excelToJson/convert`,
         formData,
         {
           headers: {

@@ -99,4 +99,3 @@ background-color: rgba(255, 255, 255, 0.9); /* 使卡片有点透明，背景图
     width: 100%; /* 确保按钮占满可用空间 */
     box-sizing: border-box; /* 确保内边距不会影响元素的宽度 */
   }
-

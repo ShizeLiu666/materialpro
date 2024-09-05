@@ -16,118 +16,144 @@ import { Alert } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import exampleFile from "../../../assets/excel/example.xlsx";
-import { processExcelToJson, splitJsonFile, resetDeviceNameToType } from "./ExcelProcessor/ExcelProcessor"; // 引入处理函数和 resetDeviceNameToType
-import { validateExcel } from "./ExcelProcessor/validation/main"; // 引入新的验证函数
+import {
+  processExcelToJson,
+  splitJsonFile,
+  resetDeviceNameToType,
+} from "./ExcelProcessor/ExcelProcessor";
+import { validateExcel } from "./ExcelProcessor/validation/main";
 
-const RoomConfigList = ({ roomTypeName }) => {
+const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
   const [file, setFile] = useState(null);
   const [jsonResult, setJsonResult] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState([]); // 使用数组来存储错误信息
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState(10);
 
   useEffect(() => {
     const lines = jsonResult.split("\n").length;
-    setRows(Math.min(Math.max(10, lines), 21)); // at least 10 rows and max 21 rows
+    setRows(Math.min(Math.max(10, lines), 21));
   }, [jsonResult]);
 
   // 检查 Excel 文件的格式
   const handleCheckExcelFormat = (event) => {
     event.preventDefault();
-
     if (!file) {
-        setErrorMessage("Please select a file first.");
-        return;
+      setErrorMessage(["Please select a file first."]);
+      return;
     }
-
     const reader = new FileReader();
     reader.onload = (e) => {
-        const data = new Uint8Array(e.target.result);
-        const validationResult = validateExcel(data);
-
-        if (validationResult.length > 0) {
-            alert(validationResult.join('\n')); // Trigger a single alert
-        } else {
-            alert("Validation passed with no errors.");
-        }
+      const data = new Uint8Array(e.target.result);
+      const validationResult = validateExcel(data);
+      if (validationResult.length > 0) {
+        setErrorMessage(validationResult); // 直接使用返回的错误消息
+      } else {
+        setErrorMessage([]); // 清空错误信息
+        setSuccessMessage("Validation passed with no errors.");
+      }
     };
     reader.readAsArrayBuffer(file);
-};
+  };
 
-  // check the type of files && report corresponding error or success message
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     const fileType = selectedFile?.type;
-    
-    // it is not an excel file?
     if (
       fileType !==
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
       fileType !== "application/vnd.ms-excel"
     ) {
-      setErrorMessage("Only Excel files are accepted. Please upload a valid Excel file.");
-      setFile(null); // clear the selected file
+      setErrorMessage([
+        "Only Excel files are accepted. Please upload a valid Excel file.",
+      ]);
+      setFile(null);
     } else {
-      setFile(selectedFile); // set the selected valid file
-      setErrorMessage("");
+      setFile(selectedFile);
+      setErrorMessage([]); // 清空错误信息
     }
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault(); // prevent default form submission behavior (e.g., page refresh)
-  
+  const handleConvertToJson = (event) => {
+    event.preventDefault();
     if (!file) {
-      setErrorMessage("Please select a file first.");
+      setErrorMessage(["Please select a file first."]); // 添加错误信息到数组
       return;
     }
-  
-    // reset deviceNameToType mapping table for new file processing
     resetDeviceNameToType();
-  
     const reader = new FileReader();
     reader.onload = (e) => {
       const data = new Uint8Array(e.target.result);
       const allTextData = processExcelToJson(data);
-      
-      // set loading state to true, indicating the file content is being processed
       setLoading(true);
-  
-      // was the content of the Excel file successfully parsed?
       if (allTextData) {
-        const result = splitJsonFile(allTextData); // ! entry point for processing & splitting Excel data into JSON format
+        const result = splitJsonFile(allTextData);
         setJsonResult(JSON.stringify(result, null, 2));
       } else {
-        setErrorMessage("No matching worksheets found");
+        setErrorMessage(["No matching worksheets found"]); // 添加错误信息到数组
+      }
+      setLoading(false);
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const handleSubmitJson = async () => {
+    
+    console.log('here: ', projectRoomId);
+
+    if (!jsonResult) {
+      setErrorMessage(["JSON content is empty."]);
+      return;
+    }
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch(
+        `/api/project-rooms/${projectRoomId}/config`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: jsonResult,
+        }
+      );
+  
+      // 检查 response 是否成功
+      if (response.ok) {
+        const data = await response.json();  // 检查响应数据
+        if (data.success) {
+          setSuccessMessage("JSON configuration submitted successfully.");
+        } else {
+          setErrorMessage([`Failed to submit JSON configuration: ${data.errorMsg}`]);
+        }
+      } else {
+        setErrorMessage(["Failed to submit JSON configuration."]);
       }
       
-      setLoading(false); // means process (success or failure) is finished
-    };
-  
-    reader.readAsArrayBuffer(file); // read the file as an ArrayBuffer for processing
-  };  
-
-  const handleCopy = () => {
-    if (jsonResult) {
-      navigator.clipboard.writeText(jsonResult);
-      setSuccessMessage("JSON content copied to clipboard.");
-      // clear the success message after 3s
+      // 3秒后隐藏成功或错误信息
       setTimeout(() => {
-        setSuccessMessage(""); 
+        setSuccessMessage('');
+        setErrorMessage([]);
       }, 3000);
+      
+    } catch (error) {
+      console.log('Error:', error);
+      setErrorMessage(["An error occurred while submitting JSON."]);
     }
-  };
+  };    
 
   const handleDownload = () => {
     if (jsonResult && file) {
-      const fileName = file.name.replace(/\.[^/.]+$/, ""); 
+      const fileName = file.name.replace(/\.[^/.]+$/, "");
       const blob = new Blob([jsonResult], { type: "application/json" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `${fileName}.json`; // set download file name as excel input file name and .json for suffix
+      link.download = `${fileName}.json`;
       link.click();
     }
-  };  
+  };
 
   return (
     <Row>
@@ -136,17 +162,24 @@ const RoomConfigList = ({ roomTypeName }) => {
           <CardTitle tag="h5" className="border-bottom p-3 mb-0">
             {roomTypeName}
           </CardTitle>
-          {errorMessage && (
+
+          {/* 错误提示 */}
+          {errorMessage.length > 0 && (
             <Alert
-              variant="outlined"
-              severity="error"
-              style={{ marginTop: "20px" }}
+              severity="warning"
+              onClose={() => setErrorMessage([])} // 允许用户点击关闭
             >
-              {errorMessage}
+              {/* 使用 dangerouslySetInnerHTML 来解析 <br> 标签 */}
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: errorMessage.join("<br>"), // 将错误信息用 <br> 标签分割
+                }}
+              />
             </Alert>
           )}
+
           <CardBody>
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={handleConvertToJson}>
               <FormGroup>
                 <Input
                   id="exampleFile"
@@ -166,8 +199,6 @@ const RoomConfigList = ({ roomTypeName }) => {
                   </a>
                 </FormText>
               </FormGroup>
-
-              {/* 检查 Excel 格式按钮 */}
               <Button
                 style={{ marginRight: "10px", marginBottom: "20px" }}
                 onClick={handleCheckExcelFormat}
@@ -175,15 +206,13 @@ const RoomConfigList = ({ roomTypeName }) => {
               >
                 Check Excel Format
               </Button>
-
               <Button
                 style={{ marginBottom: "20px" }}
                 type="submit"
                 disabled={!file}
               >
-                Submit
+                Convert to JSON
               </Button>
-              
               {loading && (
                 <Box
                   sx={{
@@ -195,34 +224,33 @@ const RoomConfigList = ({ roomTypeName }) => {
                   <CircularProgress style={{ color: "#fbcd0b" }} />
                 </Box>
               )}
-
               <FormGroup>
                 <Label for="exampleText">JSON Text Area</Label>
                 {successMessage && (
-                <Alert
-                  variant="outlined"
-                  severity="success"
-                  className="alert-slide-down"
-                  style={{marginBottom: "10px"  }}
-                >
-                  {successMessage}
-                </Alert>
-              )}
+                  <Alert
+                    variant="outlined"
+                    severity="success"
+                    className="alert-slide-down"
+                    style={{ marginBottom: "10px" }}
+                  >
+                    {successMessage}
+                  </Alert>
+                )}
                 <Input
                   id="exampleText"
                   name="text"
                   type="textarea"
                   value={jsonResult}
-                  onChange={(e) => setJsonResult(e.target.value)} // allow user to edit content
+                  onChange={(e) => setJsonResult(e.target.value)}
                   rows={rows}
                 />
               </FormGroup>
               <Button
                 style={{ marginBottom: "20px" }}
-                onClick={handleCopy}
+                onClick={handleSubmitJson}
                 disabled={!jsonResult}
               >
-                Copy
+                Submit
               </Button>{" "}
               <Button
                 style={{ marginBottom: "20px" }}

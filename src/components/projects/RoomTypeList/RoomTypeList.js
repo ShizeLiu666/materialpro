@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-// import axios from "axios";
+import axios from "axios";
 import RoomElement from "./RoomElement";
 import EditRoomTypeModal from "./EditRoomTypeModal";
 import DeleteRoomTypeModal from "./DeleteRoomTypeModal";
 import CreateRoomTypeModal from "./CreateRoomTypeModal";
-import axiosInstance, { API_development_environment } from "../../../config";
+// import axiosInstance, { API_development_environment } from "../../../config";
 import { Typography, CircularProgress, Button } from "@mui/material";
 
 const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
+  // console.log("projectId:", projectId);
   const [roomTypes, setRoomTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -24,15 +25,19 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
           return;
         }
 
-        const response = await axiosInstance.get(
-          `${API_development_environment}/api/projects/${projectId}/roomTypes`,
+        const response = await axios.get(
+          `/api/project-rooms/${projectId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        setRoomTypes(response.data);
+        if (response.data.success) {
+          setRoomTypes(response.data.data); // 直接从 data 里获取房间类型
+        } else {
+          console.error("Error fetching room types:", response.data.errorMsg);
+        }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching room types:", error);
@@ -43,19 +48,39 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
     fetchRoomTypes();
   }, [projectId]);
 
-  const handleCreateRoomType = async (name) => {
+  const handleCreateRoomType = async ({ name, typeCode, des, iconUrl }) => {
     const token = localStorage.getItem("authToken");
+
+    // 打印出即将发送的表单数据
+    console.log("Form data being sent to backend:", {
+        projectId,
+        name,
+        typeCode,
+        des,
+        iconUrl,
+    });
+
     try {
-      const response = await axiosInstance.post(
-        `${API_development_environment}/api/projects/${projectId}/roomTypes`,
-        { name },
+      const response = await axios.post(
+        "/api/project-rooms",
+        {
+          projectId,
+          name,
+          typeCode,
+          des,
+          iconUrl,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setRoomTypes([...roomTypes, response.data]);
+      if (response.data.success) {
+        setRoomTypes([...roomTypes, response.data.data]); // 将新创建的房间类型添加到现有列表中
+      } else {
+        console.error("Error creating room type:", response.data.errorMsg);
+      }
     } catch (error) {
       throw error; // 将错误抛出给调用函数
     }
@@ -64,36 +89,36 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
   const handleDeleteRoomType = async () => {
     try {
       const token = localStorage.getItem("authToken");
-      await axiosInstance.post(
-        `${API_development_environment}/api/projects/${projectId}/roomTypes/delete`,
-        { roomTypeId: selectedRoomType._id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  
+      // 使用 projectRoomId 进行删除请求
+      await axios.delete(`/api/project-rooms/${selectedRoomType.projectRoomId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      // 从 roomTypes 列表中删除该房型
       setRoomTypes((prevRoomTypes) =>
         prevRoomTypes.filter(
-          (roomType) => roomType._id !== selectedRoomType._id
+          (roomType) => roomType.projectRoomId !== selectedRoomType.projectRoomId
         )
       );
-      setDeleteModalOpen(false);
+      setDeleteModalOpen(false);  // 关闭删除模态框
     } catch (error) {
       console.error("Error deleting room type:", error);
     }
-  };
+  };  
 
   const handleEditRoomType = (roomType) => {
-    setSelectedRoomType(roomType);
-    setEditModalOpen(true);
+    // setSelectedRoomType(roomType);
+    // setEditModalOpen(true);
   };
 
   const handleSaveRoomType = async (newName) => {
     try {
       const token = localStorage.getItem("authToken");
-      const response = await axiosInstance.put(
-        `${API_development_environment}/api/projects/${projectId}/roomTypes/${selectedRoomType._id}`,
+      const response = await axios.put(
+        `/api/projects/${projectId}/roomTypes/${selectedRoomType._id}`,
         { name: newName },
         {
           headers: {
@@ -118,12 +143,15 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
   };
 
   const handleRoomTypeClick = (roomType) => {
+    console.log("Selected roomType:", roomType);  // 确保 projectRoomId 正确
+    console.log("Selected roomType id:", roomType.projectRoomId);  // 确保 projectRoomId 正确
     onNavigate(
       ["Project List", "Room Types", "Room Configurations"],
-      roomType._id,
+      roomType.projectRoomId,  // 传递 projectRoomId
       roomType.name
     );
   };
+  
   if (loading) {
     return <CircularProgress />;
   }
@@ -155,7 +183,7 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
       </div>
       {roomTypes.map((roomType) => (
         <RoomElement
-          key={roomType._id}
+          key={roomType.projectRoomId}
           primaryText={`${roomType.typeCode}`}
           secondaryText={roomType.name}
           onDelete={() => handleDeleteClick(roomType)}

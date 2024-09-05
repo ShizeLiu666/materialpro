@@ -8,6 +8,7 @@ import {
 } from "reactstrap";
 
 const ProjectCard = (props) => {
+  // console.log(props.image);
   return (
     <Card className="blog-card">
       <CardImg alt="Card image cap" src={props.image} />
@@ -18,5 +19,7 @@ const ProjectCard = (props) => {
     </Card>
   );
 };
+
+
 
 export default ProjectCard;

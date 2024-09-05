@@ -46,11 +46,12 @@ function validateRelayTypeOperations(names, operation, errors, sceneName) {
     !groupOnPattern.test(operationString) &&
     !groupOffPattern.test(operationString)
   ) {
+    // 使用 <br> 替代 \n 进行换行
     errors.push(`KASTA SCENE [${sceneName}]: Invalid operation format for Relay Type. The operation string "${operationString}" is not valid. Accepted formats are:
-            \n - DEVICE_NAME ON (Single ON)
-            \n - DEVICE_NAME OFF (Single OFF)
-            \n - DEVICE_NAME_1, DEVICE_NAME_2 ON (Group ON)
-            \n - DEVICE_NAME_1, DEVICE_NAME_2 OFF (Group OFF)`);
+            <br> - DEVICE_NAME ON (Single ON)
+            <br> - DEVICE_NAME OFF (Single OFF)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_2 ON (Group ON)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_2 OFF (Group OFF)<br>`);
   }
 }
 

@@ -3,13 +3,19 @@ import { Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, Button, A
 
 const CreateRoomTypeModal = ({ isOpen, toggle, onCreate }) => {
   const [name, setName] = useState('');
+  const [typeCode, setTypeCode] = useState(''); // 新增 typeCode
+  const [des, setDes] = useState(''); // 新增 des
+  const [iconUrl, setIconUrl] = useState(''); // 新增 iconUrl
   const [error, setError] = useState(''); // 用于存储错误消息
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await onCreate(name); // 尝试创建房型
+      await onCreate({ name, typeCode, des, iconUrl }); // 尝试创建房型，传递多个字段
       setName(''); // 清空输入框
+      setTypeCode(''); // 清空 typeCode
+      setDes(''); // 清空描述
+      setIconUrl(''); // 清空 iconUrl
       setError(''); // 清空错误消息
       toggle(); // 成功后关闭模态框
     } catch (err) {
@@ -27,7 +33,7 @@ const CreateRoomTypeModal = ({ isOpen, toggle, onCreate }) => {
         setError(''); // 3秒后清除错误消息
       }, 3000);
 
-      // 在组件卸载或error变更时清除定时器
+      // 在组件卸载或 error 变更时清除定时器
       return () => clearTimeout(timer);
     }
   }, [error]);
@@ -47,6 +53,37 @@ const CreateRoomTypeModal = ({ isOpen, toggle, onCreate }) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label for="typeCode">Room Type Code:</Label>
+            <Input
+              type="text"
+              name="typeCode"
+              id="typeCode"
+              value={typeCode}
+              onChange={(e) => setTypeCode(e.target.value)}
+              required
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label for="des">Description:</Label>
+            <Input
+              type="text"
+              name="des"
+              id="des"
+              value={des}
+              onChange={(e) => setDes(e.target.value)}
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label for="iconUrl">Icon URL:</Label>
+            <Input
+              type="text"
+              name="iconUrl"
+              id="iconUrl"
+              value={iconUrl}
+              onChange={(e) => setIconUrl(e.target.value)}
             />
           </FormGroup>
           <Button color="primary" size="sm" type="submit" style={{ backgroundColor: "#fbcd0b", borderColor: "#fbcd0b", fontWeight: "bold" }}>
