@@ -15,7 +15,10 @@ import {
 import { Alert } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import exampleFile from "../../../assets/excel/example.xlsx";
+import DeleteRoomConfigModal from "./DeleteRoomConfigModal"; // 引入自定义的删除模态框
 import {
   processExcelToJson,
   splitJsonFile,
@@ -30,13 +33,49 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState(10);
+  const [config, setConfig] = useState(null); // 用于存储现有的config
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false); // 控制删除模态框的开关
+
+  // 获取 room 的详细信息，包括 config
+  useEffect(() => {
+    const fetchRoomDetail = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await fetch(
+          `/api/project-rooms/detail/${projectRoomId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+        if (data.success && data.data) {
+          setConfig(data.data.config); // 设置config
+        } else {
+          setErrorMessage([`Error fetching room details: ${data.errorMsg}`]);
+        }
+      } catch (error) {
+        setErrorMessage(["Error fetching room details."]);
+      }
+    };
+
+    fetchRoomDetail();
+  }, [projectRoomId]);
 
   useEffect(() => {
     const lines = jsonResult.split("\n").length;
     setRows(Math.min(Math.max(10, lines), 21));
   }, [jsonResult]);
 
-  // 检查 Excel 文件的格式
+  const handleDeleteConfig = async () => {
+    // 这里可以添加实际删除配置的逻辑
+    setConfig(null); // 假设删除后将config设置为空
+    setDeleteModalOpen(false); // 关闭模态框
+  };
+
   const handleCheckExcelFormat = (event) => {
     event.preventDefault();
     if (!file) {
@@ -78,7 +117,7 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
   const handleConvertToJson = (event) => {
     event.preventDefault();
     if (!file) {
-      setErrorMessage(["Please select a file first."]); // 添加错误信息到数组
+      setErrorMessage(["Please select a file first."]);
       return;
     }
     resetDeviceNameToType();
@@ -91,7 +130,7 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
         const result = splitJsonFile(allTextData);
         setJsonResult(JSON.stringify(result, null, 2));
       } else {
-        setErrorMessage(["No matching worksheets found"]); // 添加错误信息到数组
+        setErrorMessage(["No matching worksheets found"]);
       }
       setLoading(false);
     };
@@ -99,9 +138,6 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
   };
 
   const handleSubmitJson = async () => {
-    
-    console.log('here: ', projectRoomId);
-
     if (!jsonResult) {
       setErrorMessage(["JSON content is empty."]);
       return;
@@ -119,38 +155,48 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
           body: jsonResult,
         }
       );
-  
-      // 检查 response 是否成功
+
       if (response.ok) {
-        const data = await response.json();  // 检查响应数据
+        const data = await response.json();
         if (data.success) {
           setSuccessMessage("JSON configuration submitted successfully.");
         } else {
-          setErrorMessage([`Failed to submit JSON configuration: ${data.errorMsg}`]);
+          setErrorMessage([
+            `Failed to submit JSON configuration: ${data.errorMsg}`,
+          ]);
         }
       } else {
         setErrorMessage(["Failed to submit JSON configuration."]);
       }
-      
-      // 3秒后隐藏成功或错误信息
+
       setTimeout(() => {
-        setSuccessMessage('');
+        setSuccessMessage("");
         setErrorMessage([]);
       }, 3000);
-      
     } catch (error) {
-      console.log('Error:', error);
       setErrorMessage(["An error occurred while submitting JSON."]);
     }
-  };    
+  };
 
-  const handleDownload = () => {
+  // 下载已有 config 文件的函数
+  const handleDownloadConfig = () => {
+    const blob = new Blob([JSON.stringify(config, null, 2)], {
+      type: "application/json",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "room_config.json";
+    link.click();
+  };
+
+  // 下载转换后的 JSON 文件
+  const handleDownloadConvertedJson = () => {
     if (jsonResult && file) {
       const fileName = file.name.replace(/\.[^/.]+$/, "");
       const blob = new Blob([jsonResult], { type: "application/json" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = `${fileName}.json`;
+      link.download = `${fileName}_converted.json`;
       link.click();
     }
   };
@@ -159,20 +205,43 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
     <Row>
       <Col>
         <Card>
-          <CardTitle tag="h5" className="border-bottom p-3 mb-0">
-            {roomTypeName}
-          </CardTitle>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            className="border-bottom p-3 mb-0"
+          >
+            <CardTitle tag="h5">{roomTypeName}</CardTitle>
+            {/* 如果config存在，则显示下载图标和删除图标 */}
+            {config && (
+              <Box display="flex" alignItems="center">
+                <CloudDownloadIcon
+                  onClick={handleDownloadConfig}
+                  style={{
+                    color: "#fbcd0b",
+                    cursor: "pointer",
+                    marginRight: "10px",
+                  }}
+                  fontSize="large"
+                />
+                <DeleteForeverIcon
+                  onClick={() => setDeleteModalOpen(true)} // 打开删除模态框
+                  style={{
+                    // color: "red",
+                    cursor: "pointer",
+                  }}
+                  fontSize="large"
+                />
+              </Box>
+            )}
+          </Box>
 
           {/* 错误提示 */}
           {errorMessage.length > 0 && (
-            <Alert
-              severity="warning"
-              onClose={() => setErrorMessage([])} // 允许用户点击关闭
-            >
-              {/* 使用 dangerouslySetInnerHTML 来解析 <br> 标签 */}
+            <Alert severity="warning" onClose={() => setErrorMessage([])}>
               <span
                 dangerouslySetInnerHTML={{
-                  __html: errorMessage.join("<br>"), // 将错误信息用 <br> 标签分割
+                  __html: errorMessage.join("<br>"),
                 }}
               />
             </Alert>
@@ -189,7 +258,7 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
                 />
                 <FormText>
                   * Only Excel files are accepted, and they must meet specific
-                  configuration requirements
+                  configuration requirements.
                   <br /> * Please refer to the{" "}
                   <a
                     href={exampleFile}
@@ -207,8 +276,8 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
                 Check Excel Format
               </Button>
               <Button
-                style={{ marginBottom: "20px" }}
                 type="submit"
+                style={{ marginRight: "10px", marginBottom: "20px" }}
                 disabled={!file}
               >
                 Convert to JSON
@@ -245,23 +314,25 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
                   rows={rows}
                 />
               </FormGroup>
-              <Button
-                style={{ marginBottom: "20px" }}
-                onClick={handleSubmitJson}
-                disabled={!jsonResult}
-              >
+              <Button onClick={handleSubmitJson} disabled={!jsonResult}>
                 Submit
               </Button>{" "}
               <Button
-                style={{ marginBottom: "20px" }}
-                onClick={handleDownload}
+                onClick={handleDownloadConvertedJson}
                 disabled={!jsonResult}
               >
-                Download
-              </Button>{" "}
+                Download Converted JSON
+              </Button>
             </Form>
           </CardBody>
         </Card>
+
+        {/* 删除模态框 */}
+        <DeleteRoomConfigModal
+          isOpen={deleteModalOpen}
+          toggle={() => setDeleteModalOpen(!deleteModalOpen)}
+          onDelete={handleDeleteConfig}
+        />
       </Col>
     </Row>
   );

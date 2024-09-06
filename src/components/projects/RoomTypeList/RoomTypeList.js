@@ -147,7 +147,7 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
     console.log("Selected roomType id:", roomType.projectRoomId);  // 确保 projectRoomId 正确
     onNavigate(
       ["Project List", "Room Types", "Room Configurations"],
-      roomType.projectRoomId,  // 传递 projectRoomId
+      roomType.projectRoomId,
       roomType.name
     );
   };
