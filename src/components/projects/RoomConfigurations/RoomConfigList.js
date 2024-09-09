@@ -53,7 +53,6 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
   // Toggle for Replace Confirmation Modal
   const toggleReplaceModal = () => setReplaceModalOpen(!replaceModalOpen);
 
-  // 获取 room 的详细信息，包括 config
   const fetchRoomDetail = useCallback(async () => {
     try {
       const token = localStorage.getItem("authToken");
@@ -80,7 +79,7 @@ const RoomConfigList = ({ roomTypeName, projectRoomId }) => {
 
   useEffect(() => {
     fetchRoomDetail();
-  }, [projectRoomId, fetchRoomDetail]); // Include fetchRoomDetail in the dependency array
+  }, [projectRoomId, fetchRoomDetail]);
 
   useEffect(() => {
     const lines = jsonResult.split("\n").length;

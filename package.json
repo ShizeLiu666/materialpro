@@ -61,5 +61,6 @@
   },
   "overrides": {
     "nth-check": "2.1.1"
-  }
+  },
+  "proxy": "http://kastacloud.com"
 }
