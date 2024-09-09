@@ -169,14 +169,15 @@ const RoomTypeList = ({ projectId, projectName, onNavigate }) => {
           {projectName}
         </Typography>
         <Button
+          color="primary"
           onClick={() => setCreateModalOpen(true)}
           style={{
             backgroundColor: "#fbcd0b",
             color: "#fff",
             fontWeight: "bold",
             marginBottom: "5px",
+            textTransform: "none", // 确保文字不变为大写
           }}
-          size="small"
         >
           Create Room Type
         </Button>

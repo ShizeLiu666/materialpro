@@ -12,11 +12,11 @@ export const AllDeviceTypes = {
     },
     "Dry Contact": ["S10IBH"],
     "Remote Control": {
-        "1 Push Panel": ["H1RSMB"],
+        "1 Push Panel": ["H1RSMB", "1BMBH"],
         "2 Push Panel": ["H2RSMB"],
         "3 Push Panel": ["H3RSMB"],
         "4 Push Panel": ["H4RSMB"],
-        "5 Push Panel": ["H5RSMB", "H14SMB"],
+        "5 Push Panel": ["H5RSMB"],
         "6 Push Panel": ["H6RSMB"]
     },
     "5 Input Module": ["5RSIBH"],

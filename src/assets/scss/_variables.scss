@@ -58,7 +58,7 @@ $gradient: linear-gradient(-90deg, rgba($white, 0.5), rgba($white, 0)) !default;
 /*******************/
 // Theme common variable
 /********************/
-$border-radius: 0.3rem !default;
+$border-radius: 0.1rem !default;
 $box-shadow: 0 0.5rem 1rem rgba($black, 0.05);
 $headings-font-weight: 400 !default;
 
@@ -82,5 +82,5 @@ $btn-focus-width: 0px;
 /*******************/
 // Theme sidebar width
 /********************/
-$sidebarWidth: 260px;
+$sidebarWidth: 250px;
 $sidebarColor: $white;

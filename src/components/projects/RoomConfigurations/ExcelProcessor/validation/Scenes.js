@@ -75,12 +75,12 @@ function validateDimmerTypeOperations(names, operation, errors, sceneName) {
     !groupDimmerPattern.test(operationString)
   ) {
     errors.push(`KASTA SCENE [${sceneName}]: Dimmer Type operation '${operationString}' does not match any of the allowed formats. Accepted formats are:
-            \n - DEVICE_NAME ON (Single ON)
-            \n - DEVICE_NAME OFF (Single OFF)
-            \n - DEVICE_NAME_1, DEVICE_NAME_2 ON (Group ON)
-            \n - DEVICE_NAME_1, DEVICE_NAME_2 OFF (Group OFF)
-            \n - DEVICE_NAME ON +XX% (Single Device Dimming)
-            \n - DEVICE_NAME_1, DEVICE_NAME_2 ON +XX% (Group Device Dimming)`);
+            <br> - DEVICE_NAME ON (Single ON)
+            <br> - DEVICE_NAME OFF (Single OFF)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_2 ON (Group ON)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_2 OFF (Group OFF)
+            <br> - DEVICE_NAME ON +XX% (Single Device Dimming)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_2 ON +XX% (Group Device Dimming)<br>`);
   } else {
     const dimmerMatch = operation.match(/\+(\d+)%$/);
     if (dimmerMatch) {
@@ -132,9 +132,9 @@ function validateFanTypeOperations(parts, errors, sceneName) {
     !singleFanOffPattern.test(operationString)
   ) {
     errors.push(`KASTA SCENE [${sceneName}]: Fan Type operation '${operationString}' does not match any of the allowed formats. Accepted formats are:
-            \n - FAN_NAME ON RELAY ON (Single ON)
-            \n - FAN_NAME OFF RELAY OFF (Single OFF)
-            \n - FAN_NAME ON RELAY ON SPEED X (Single ON with Speed, optional)`);
+            <br> - FAN_NAME ON RELAY ON (Single ON)
+            <br> - FAN_NAME OFF RELAY OFF (Single OFF)
+            <br> - FAN_NAME ON RELAY ON SPEED X (Single ON with Speed, optional)<br>`);
   }
 }
 
@@ -151,10 +151,10 @@ function validateCurtainTypeOperations(names, operation, errors, sceneName) {
     !groupCurtainPattern.test(operationString)
   ) {
     errors.push(`KASTA SCENE [${sceneName}]: Invalid operation format for Curtain Type. The operation string "${operationString}" is not valid. Accepted formats are:
-            \n - DEVICE_NAME OPEN (Single Open)
-            \n - DEVICE_NAME CLOSE (Single Close)
-            \n - DEVICE_NAME_1, DEVICE_NAME_2 OPEN (Group Open)
-            \n - DEVICE_NAME_1, DEVICE_NAME_2 CLOSE (Group Close)`);
+            <br> - DEVICE_NAME OPEN (Single Open)
+            <br> - DEVICE_NAME CLOSE (Single Close)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_2 OPEN (Group Open)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_2 CLOSE (Group Close)<br>`);
   }
 }
 
@@ -241,10 +241,10 @@ function validatePowerPointTypeOperations(
 
   if (!isValid) {
     errors.push(`KASTA SCENE [${sceneName}]: Invalid POWERPOINT operation. The operation string "${operationString}" is not valid for device type "${deviceType}". Supported formats are:
-            \n - DEVICE_NAME ON (Single-way ON)
-            \n - DEVICE_NAME ON ON (Two-way ON ON)
-            \n - DEVICE_NAME OFF OFF (Two-way OFF OFF)
-            \n - DEVICE_NAME_1, DEVICE_NAME_ ON OFF (Group ON OFF)`);
+            <br> - DEVICE_NAME ON (Single-way ON)
+            <br> - DEVICE_NAME ON ON (Two-way ON ON)
+            <br> - DEVICE_NAME OFF OFF (Two-way OFF OFF)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_ ON OFF (Group ON OFF)<br>`);
   }
 }
 
@@ -264,10 +264,10 @@ function validateDryContactTypeOperations(names, operation, errors, sceneName) {
     !groupOffPattern.test(operationString)
   ) {
     errors.push(`KASTA SCENE [${sceneName}]: Invalid operation format for Dry Contact Type. The operation string "${operationString}" is not valid. Accepted formats are:
-            \n - DEVICE_NAME ON (Single ON)
-            \n - DEVICE_NAME OFF (Single OFF)
-            \n - DEVICE_NAME_1, DEVICE_NAME_2 ON (Group ON)
-            \n - DEVICE_NAME_1, DEVICE_NAME_2 OFF (Group OFF)`);
+            <br> - DEVICE_NAME ON (Single ON)
+            <br> - DEVICE_NAME OFF (Single OFF)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_2 ON (Group ON)
+            <br> - DEVICE_NAME_1, DEVICE_NAME_2 OFF (Group OFF)<br>`);
   }
 }
 

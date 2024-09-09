@@ -3,8 +3,8 @@ import { Nav, NavItem } from "reactstrap";
 import { Link, useLocation } from "react-router-dom";
 import '../assets/scss/loader/Sidebar.css'
 import projecttIcon from '../assets/icons/project.png';
-import convertIcon from '../assets/icons/convert_file.png';
-import aboutIcon from '../assets/icons/about.png';
+// import convertIcon from '../assets/icons/convert_file.png';
+// import aboutIcon from '../assets/icons/about.png';
 
 const navigation = [
   {
@@ -12,16 +12,16 @@ const navigation = [
     href: "/admin/projects",
     img: projecttIcon,
   },
-  {
-    title: "Converter",
-    href: "/admin/excelconverter",
-    img: convertIcon,
-  },
-  {
-    title: "About",
-    href: "/admin/about",
-    icon: aboutIcon,
-  },
+  // {
+  //   title: "Converter",
+  //   href: "/admin/excelconverter",
+  //   img: convertIcon,
+  // },
+  // {
+  //   title: "About",
+  //   href: "/admin/about",
+  //   icon: aboutIcon,
+  // },
   // {
   //   title: "Dashboard",
   //   href: "/admin/starter",

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Row, Col, Breadcrumb, BreadcrumbItem } from "reactstrap";
-import axios from "axios";  // 直接使用 axios
+import { Row, Col, Breadcrumb, BreadcrumbItem} from "reactstrap";
+import axios from "axios";
 import ProjectCard from "./ProjectCard";
 import PasswordModal from "./PasswordModal";
 import RoomTypeList from "../RoomTypeList/RoomTypeList";
-import RoomConfigList from "../RoomConfigurations/RoomConfigList"; // 导入 RoomConfigList
+import RoomConfigList from "../RoomConfigurations/RoomConfigList";
 import default_image from "../../../assets/images/projects/default_image.jpg";
 import Alert from "@mui/material/Alert";
+// import CreateProjectModal from "./CreateProjectModal"; // Import the new CreateProjectModal
 
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -20,6 +21,7 @@ const ProjectList = () => {
   });
   const [breadcrumbPath, setBreadcrumbPath] = useState(["Project List"]);
   const [showRoomTypes, setShowRoomTypes] = useState(false);
+  // const [createProjectModalOpen, setCreateProjectModalOpen] = useState(false); // Track the Create Project Modal
 
   useEffect(() => {
     const fetchProjectList = async () => {
@@ -29,16 +31,12 @@ const ProjectList = () => {
           console.error("No token found, please log in again.");
           return;
         }
-  
-        // 通过代理直接调用 `/api/projects`，无需 baseURL
-        const response = await axios.get(
-          "/api/projects",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // 发送 token 确定用户的可访问项目
-            },
-          }
-        );
+
+        const response = await axios.get("/api/projects", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.data.success) {
           const projects = response.data.data.map((project) => ({
@@ -57,13 +55,17 @@ const ProjectList = () => {
         console.error("Error fetching projects:", error);
       }
     };
-  
+
     fetchProjectList();
   }, []);
 
   const toggleModal = () => {
     setModalOpen(!modalOpen);
   };
+
+  // const toggleCreateProjectModal = () => {
+  //   setCreateProjectModalOpen(!createProjectModalOpen); // Toggle Create Project Modal
+  // };
 
   const handleCardClick = (project) => {
     setSelectedProject(project);
@@ -72,7 +74,6 @@ const ProjectList = () => {
 
   const handlePasswordSubmit = async (password) => {
     try {
-      // 不再需要请求服务器，只做密码比较
       if (password === selectedProject.password) {
         setAlert({
           severity: "success",
@@ -81,12 +82,11 @@ const ProjectList = () => {
         });
         setTimeout(() => {
           setAlert({ open: false });
-          toggleModal();  // 关闭模态框
-          setBreadcrumbPath(["Project List", "Room Types"]);  // 更新面包屑导航
-          setShowRoomTypes(true);  // 显示房间类型列表
+          toggleModal();
+          setBreadcrumbPath(["Project List", "Room Types"]);
+          setShowRoomTypes(true);
         }, 1000);
       } else {
-        // 如果密码不匹配，显示错误消息
         setAlert({
           severity: "error",
           message: `Incorrect password for ${selectedProject.name}.`,
@@ -94,7 +94,6 @@ const ProjectList = () => {
         });
       }
     } catch (error) {
-      // 处理其他意外错误
       setAlert({
         severity: "error",
         message: "An error occurred. Please try again later.",
@@ -102,16 +101,15 @@ const ProjectList = () => {
       });
       console.error("Error verifying password:", error);
     }
-  
-    // 3秒后关闭提示框
+
     setTimeout(() => {
       setAlert({ open: false });
     }, 3000);
-  };  
+  };
 
   const handleBreadcrumbClick = () => {
     setBreadcrumbPath(["Project List"]);
-    setShowRoomTypes(false); // 回到项目列表
+    setShowRoomTypes(false);
   };
 
   const handleNavigate = (newPath, roomTypeId, roomTypeName) => {
@@ -188,6 +186,19 @@ const ProjectList = () => {
         </Col>
       </Row>
 
+      {/* Add a button to open Create Project Modal */}
+      {/* <Button
+        style={{
+          backgroundColor: "#fbcd0b",
+          color: "#fff",
+          fontWeight: "bold",
+          marginBottom: "10px",
+        }}
+        onClick={toggleCreateProjectModal}
+      >
+        Create New Project
+      </Button> */}
+
       {!showRoomTypes && (
         <Row>
           {projects.map((project, index) => (
@@ -215,7 +226,7 @@ const ProjectList = () => {
 
       {breadcrumbPath.length === 3 && selectedRoomType && (
         <RoomConfigList
-          projectRoomId={selectedRoomType.id} // 传递 roomTypeId
+          projectRoomId={selectedRoomType.id}
           roomTypeName={selectedRoomType.name}
         />
       )}
@@ -228,6 +239,13 @@ const ProjectList = () => {
           onSubmit={handlePasswordSubmit}
         />
       )}
+
+      {/* Add Create Project Modal */}
+      {/* <CreateProjectModal
+        isOpen={createProjectModalOpen}
+        toggle={toggleCreateProjectModal}
+        // Handle project creation here
+      /> */}
     </div>
   );
 };
